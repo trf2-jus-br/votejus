@@ -44,6 +44,20 @@ export default function Dashboard(props) {
     router.refresh()
   };
 
+  const handleResendEmail = async (voterId) => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/resend`, { administratorJwt: props.jwt, voterId })
+  };
+
+  const handleAddEmail = async (voterId, email) => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/addEmail`, { administratorJwt: props.jwt, voterId, email })
+    router.refresh()
+  };
+
+  const handleAddVoter = async (name, email) => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/addVoter`, { administratorJwt: props.jwt, name, email })
+    router.refresh()
+  };
+
   const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher);
 
   if (error) return <div>falhou em carregar</div>
@@ -83,8 +97,8 @@ export default function Dashboard(props) {
 
   const voterCardsDel = data.voters.map((v, idx) => {
     return (
-      <div key={v.id} class="col">
-        <div class="card">
+      <div key={v.id} className="col">
+        <div className="card">
           <div className="card-header p-2">
             <div className="row"><div className="col">{v.name}</div>
               <div className="col-auto">
@@ -105,8 +119,8 @@ export default function Dashboard(props) {
               </div>
             </div>
           </div>
-          <div class="card-body p-2">
-            <small class="text-muted">{v.email}</small>
+          <div className="card-body p-2">
+            <small className="text-muted">{v.email}</small>
           </div>
         </div>
       </div>
@@ -116,8 +130,8 @@ export default function Dashboard(props) {
 
   const voterCards = data.voters.map((v, idx) => {
     return (
-      <div key={v.id} class="col">
-        <div class="card">
+      <div key={v.id} className="col">
+        <div className="card">
 
           {v.voteDatetime
             ? <div className="card-header p-2 m-0 alert alert-success">{v.name}</div>
@@ -166,7 +180,7 @@ export default function Dashboard(props) {
         {data.start && !data.end &&
           <>
             <h3 className="mb-1 mt-4">Painel de Acompanhamento</h3>
-            <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-4">
+            <div className="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-4">
               {voterCards}
             </div>
           </>

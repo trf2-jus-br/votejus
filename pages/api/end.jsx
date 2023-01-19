@@ -16,27 +16,7 @@ export default async function handler(req, res) {
         const voterLink = `${process.env.API_URL_BROWSER}vote/${voterJwt}`
 
         v.email.split(',').forEach(email => {
-            const message = {
-                from: mailer.from,
-                to: email.trim(),
-                subject: `${election.name}: Eleição Finalizada`,
-                text: `
-Prezado(a) ${v.name},
-
-A votação "${election.name}" foi encerrada.
-
-Obrigado por utilizar o Votejus.
-
----
-TRF2-VOTEJUS-${electionId}`}
-
-            mailer.transporter.sendMail(message, (err, info) => {
-                if (err) {
-                    console.log(err)
-                } else {
-                    console.log(info);
-                }
-            })
+            mailer.sendElectionEnded(email, electionId, election.name, v.name)
         })
     })
 

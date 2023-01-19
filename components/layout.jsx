@@ -27,9 +27,9 @@ export default function Layout({ children, home }) {
             <link rel="icon" href="/favicon.ico" />
         </Head>
         <header>
-            <div class="navbar navbar-dark bg-dark shadow-sm mb-4">
-                <div class="container">
-                    <div class="navbar-brand d-flex align-items-center">
+            <div className="navbar navbar-dark bg-dark shadow-sm mb-4">
+                <div className="container">
+                    <div className="navbar-brand d-flex align-items-center">
                         <span className="text-success font-weight-bold" style={{ fontSize: "150%" }}><FontAwesomeIcon icon={faCheckToSlot} /></span>&nbsp;&nbsp;
                         <strong>Votejus</strong>
                     </div>
