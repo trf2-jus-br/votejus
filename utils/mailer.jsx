@@ -16,7 +16,7 @@ export default {
 
     from: process.env.SMTP_FROM,
 
-    send() {
+    send(message) {
         this.transporter.sendMail(message, (err, info) => {
             if (err) {
                 console.log(err)
@@ -36,27 +36,26 @@ export default {
 
     sendCreated(email, electionId, electionName, administratorLink) {
         this.send({
-            from: mailer.from,
+            from: this.from,
             to: email,
             subject: `${electionName}: Criada`,
-            text: `
-    A votação "${electionName}" foi criada com sucesso.
+            text: `A votação "${electionName}" foi criada com sucesso.
     
-    Utilize o link abaixo para iniciar a votação e acompanhar os resultados.
-    
-    ${administratorLink}
-    
-    Atenção: 
-    
-    - Não compartilhe este link pois só o administrados da votação deve ter acesso ao link.
-    
-    - Não apague esse email pois sem o link acima não será possível acessar o painel de votação.` + this.footer(electionId)
+Utilize o link abaixo para iniciar a votação e acompanhar os resultados.
+
+${administratorLink}
+
+Atenção: 
+
+- Não compartilhe este link pois só o administrados da votação deve ter acesso ao link.
+
+- Não apague esse email pois sem o link acima não será possível acessar o painel de votação.` + this.footer(electionId)
         })
     },
 
     sendVoteRequest(email, electionId, electionName, voterName, voterLink) {
         this.send({
-            from: mailer.from,
+            from: this.from,
             to: email.trim(),
             subject: `${electionName}: Voto Solicitado`,
             text: `Prezado(a) ${voterName},
@@ -79,7 +78,7 @@ Atenção:
 
     sendVoteAccepted(email, electionId, electionName, voterName) {
         this.send({
-            from: mailer.from,
+            from: this.from,
             to: email.trim(),
             subject: `${electionName}: Voto Registrado`,
             text: `Prezado(a) ${voterName},
@@ -90,7 +89,7 @@ Seu voto secreto foi registrado para a eleição "${electionName}".` + this.foot
 
     sendElectionEnded(email, electionId, electionName, voterName) {
         this.send({
-            from: mailer.from,
+            from: this.from,
             to: email.trim(),
             subject: `${electionName}: Eleição Finalizada`,
             text: `Prezado(a) ${voterName},

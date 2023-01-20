@@ -20,6 +20,7 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function Vote(props) {
+  const [errorMessage, setErrorMessage] = useState(undefined)
   const [candidateId, setCandidateId] = useState(undefined)
   const [voting, setVoting] = useState(false)
 
@@ -31,7 +32,7 @@ export default function Vote(props) {
 
   const handleClickVote = async () => {
     setVoting(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId })
+    await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
     router.refresh()
     setVoting(false)
   };
@@ -47,7 +48,7 @@ export default function Vote(props) {
   const voteTime = new Date(props.data.voteDatetime).toLocaleTimeString();
 
   return (
-    <Layout>
+    <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <h1 className='mb-4'>{props.data.electionName}</h1>
 
       {props.data.voteDatetime

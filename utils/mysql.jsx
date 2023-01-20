@@ -103,6 +103,35 @@ export default {
             throw e
         }
         conn.release()
+    },
+
+    async addEmail(electionId, voterId, email) {
+        const conn = await this.getConnection()
+        conn.beginTransaction()
+
+        try {
+            const resultElection = await conn.query('SELECT * FROM election WHERE election_id = ?;', [electionId])
+            const electionName = resultElection[0][0].election_name
+            const electionStart = resultElection[0][0].election_start
+            const electionEnd = resultElection[0][0].election_end
+
+            if (electionEnd) throw `Eleição ${electionName} já está encerrada`
+
+            const resultVoter = await conn.query('SELECT * FROM voter WHERE election_id = ? and voter_id = ?;', [electionId, voterId])
+            const voteDatetime = resultVoter[0][0].voter_vote_datetime
+
+            if (voteDatetime) throw `Usuário ${voterId} já votou.`
+
+            // TESTAR SE ELEICAO ESTÁ STARTED E NÃO ESTÁ ENDED
+
+            const result2 = await conn.query("UPDATE voter SET voter_email = CONCAT(voter_email, ', ', ?) WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;", [email, electionId, voterId])
+
+            conn.commit()
+        } catch (e) {
+            conn.rollback()
+            throw e
+        }
+        conn.release()
     }
 
 }

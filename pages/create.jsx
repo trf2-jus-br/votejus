@@ -15,6 +15,8 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function Create(props) {
+  const [errorMessage, setErrorMessage] = useState(undefined)
+  
   const exampleElectionName = 'Eleição para Presidente'
   const exampleAdministratorEmail = 'nome@empresa.com.br'
   const exampleVoters = `Fulano: fulano@exemplo.com.br\nBeltrano: beltrano@exemplo.com`
@@ -39,13 +41,13 @@ export default function Create(props) {
 
   const handleClickCreate = async () => {
     setCreating(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates })
+    await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
     setCreated(true)
     setCreating(false)
   };
 
   return (
-    <Layout>
+    <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <h1 className='mb-4'>Criação de Votação</h1>
 
       {created

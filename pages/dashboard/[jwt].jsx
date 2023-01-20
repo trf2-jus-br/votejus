@@ -8,6 +8,8 @@ import useSWR, { SWRConfig } from 'swr'
 import { useRouter } from 'next/navigation'
 import Fetcher from '../../utils/fetcher'
 import Layout from '../../components/layout'
+import ModalOkCancel from '../../components/modalOkCancel'
+import ModalEmail from '../../components/modalEmail'
 
 export function getServerSideProps({ params }) {
   return {
@@ -32,29 +34,63 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
 ));
 
 export default function Dashboard(props) {
+  const [errorMessage, setErrorMessage] = useState(undefined)
+  const [showModalResendEmail, setShowModalResendEmail] = useState(false)
+  const [selectedVoterId, setSelectedVoterId] = useState(undefined)
+  const [selectedVoterName, setSelectedVoterName] = useState(undefined)
+  const [showModalAddEmail, setShowModalAddEmail] = useState(false)
+
   const router = useRouter()
 
   const handleClickStart = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/start`, { administratorJwt: props.jwt }, { refresh: true })
+    await Fetcher.post(`${props.API_URL_BROWSER}api/start`, { administratorJwt: props.jwt }, { setErrorMessage })
     router.refresh()
   };
 
   const handleClickEnd = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/end`, { administratorJwt: props.jwt })
+    await Fetcher.post(`${props.API_URL_BROWSER}api/end`, { administratorJwt: props.jwt }, { setErrorMessage })
     router.refresh()
   };
 
-  const handleResendEmail = async (voterId) => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/resend`, { administratorJwt: props.jwt, voterId })
-  };
+  const openModalResendEmail = (voterId, voterName) => {
+    setSelectedVoterId(voterId)
+    setSelectedVoterName(voterName)
+    setShowModalResendEmail(true)
+    console.log('open')
+  }
 
-  const handleAddEmail = async (voterId, email) => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/addEmail`, { administratorJwt: props.jwt, voterId, email })
+  const closeModalResendEmail = () => {
+    setShowModalResendEmail(false)
+    setSelectedVoterId(undefined)
+    setSelectedVoterName(undefined)
+  }
+
+  const handleResendEmail = async () => {
+    console.log('handle')
+    await Fetcher.post(`${props.API_URL_BROWSER}api/resend`, { administratorJwt: props.jwt, voterId: selectedVoterId }, { setErrorMessage })
+    closeModalResendEmail()
+  }
+
+  const openModalAddEmail = (voterId, voterName) => {
+    setSelectedVoterId(voterId)
+    setSelectedVoterName(voterName)
+    setShowModalAddEmail(true)
+  }
+
+  const closeModalAddEmail = () => {
+    setShowModalAddEmail(false)
+    setSelectedVoterId(undefined)
+    setSelectedVoterName(undefined)
+  }
+
+  const handleAddEmail = async (voterEmail) => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/addEmail`, { administratorJwt: props.jwt, voterId: selectedVoterId, voterEmail }, { setErrorMessage })
+    closeModalAddEmail()
     router.refresh()
   };
 
-  const handleAddVoter = async (name, email) => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/addVoter`, { administratorJwt: props.jwt, name, email })
+  const handleAddVoter = async (voterName, voterEmail) => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/addVoter`, { administratorJwt: props.jwt, voterName, voterEmail }, { setErrorMessage })
     router.refresh()
   };
 
@@ -85,8 +121,8 @@ export default function Dashboard(props) {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                  <Dropdown.Item href="#/action-1">Reenviar o E-mail</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Substituir o E-mail</Dropdown.Item>
+                  <Dropdown.Item onClick={() => openModalResendEmail(v.id, v.name)}>Reenviar o e-mail</Dropdown.Item>
+                  <Dropdown.Item onClick={() => openModalAddEmail(v.id, v.name)}>Adicionar outro e-mail</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
           }
@@ -155,9 +191,11 @@ export default function Dashboard(props) {
     );
   });
 
+
+
   return (
-    <SWRConfig value={{ refreshInterval: 100 }}>
-      <Layout>
+    <SWRConfig value={{ refreshInterval: 2000 }}>
+      <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
         <h1 className='mb-4'>{data.name}</h1>
 
         <div>
@@ -225,6 +263,10 @@ export default function Dashboard(props) {
             </tbody>
           </table>
         </div>
+
+        <ModalOkCancel show={showModalResendEmail} onOk={handleResendEmail} onCancel={closeModalResendEmail} title="Reenvio de Email" text={`Deseja reenviar o email para ${selectedVoterName}?`} />
+        <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
+
       </Layout>
     </SWRConfig>
   )
