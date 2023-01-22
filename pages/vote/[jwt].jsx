@@ -33,8 +33,8 @@ export default function Vote(props) {
   const handleClickVote = async () => {
     setVoting(true)
     await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
-    router.refresh()
     setVoting(false)
+    router.refresh()
   };
 
   const candidateRows = props.data.candidates.map((c, idx) => {

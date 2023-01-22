@@ -4,6 +4,8 @@ const options = {
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
     secureConnection: false, // TLS requires secureConnection to be false
+    secure: false,
+    ignoreTLS: true,
     tls: {
         rejectUnauthorized: false
     }

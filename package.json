@@ -1,9 +1,9 @@
 {
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev -p 80",
         "build": "next build",
-        "start": "next start -p 8081"
+        "start": "next start -p 80"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^6.2.1",
