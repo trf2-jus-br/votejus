@@ -19,7 +19,7 @@ export default function Create(props) {
   
   const defaultElectionName = 'Eleição para Presidente'
   const defaultAdministratorEmail = 'crivano@trf2.jus.br'
-  const defaultVoters = `Renato Crivano: crivano@trf2.jus.br\nJoão Luís: joao.luis@trf2.jus.br`
+  const defaultVoters = `Renato Crivano: crivano@trf2.jus.br\nJoão Luís: joaoluis@trf2.jus.br`
   const defaultCandidates = `Fulano\nSicrano\nBeltrano`
   
   const [electionName, setElectionName] = useState(defaultElectionName)
