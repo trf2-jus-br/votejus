@@ -17,27 +17,7 @@ export default async function handler(req, res) {
     await mysql.vote(electionId, voterId, candidateId)
 
     voter.email.split(',').forEach(email => {
-        const message = {
-            from: mailer.from,
-            to: email.trim(),
-            subject: `${election.name}: Voto Registrado`,
-            text: `
-Prezado(a) ${voter.name},
-
-Seu voto secreto foi registrado para a eleição "${election.name}".
-
-Obrigado por utilizar o Votejus.
-
----
-TRF2-VOTEJUS-${electionId}`}
-
-        mailer.transporter.sendMail(message, (err, info) => {
-            if (err) {
-                console.log(err)
-            } else {
-                console.log(info);
-            }
-        })
+        mailer.sendVoteAccepted(email, electionId, election.name, voter.name)
     })
 
     res.status(200).json({ status: 'OK' });
