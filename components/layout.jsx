@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Container from 'react-bootstrap/Container';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
-import ModalOkCancel from './modalOkCancel'
+import ModalError from './modalError'
 
 const name = 'Your Name';
 export const siteTitle = 'Next.js Sample Website';
@@ -41,7 +41,7 @@ export default function Layout({ children, errorMessage, setErrorMessage }) {
         <div className="container">
             {children}
         </div>
-        <ModalOkCancel show={errorMessage} onOk={() => setErrorMessage(undefined)} onCancel={() => setErrorMessage(undefined)} title="Ocorreu um erro" text={errorMessage} />
+        <ModalError show={errorMessage} onOk={() => setErrorMessage(undefined)} onCancel={() => setErrorMessage(undefined)} title="Atenção" text={errorMessage} />
     </>
     );
 }

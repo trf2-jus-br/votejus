@@ -16,16 +16,16 @@ export async function getServerSideProps({ params }) {
 
 export default function Create(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
-  
+
   const exampleElectionName = 'Eleição para Presidente'
   const exampleAdministratorEmail = 'nome@empresa.com.br'
   const exampleVoters = `Fulano: fulano@exemplo.com.br\nBeltrano: beltrano@exemplo.com`
-  const exampleCandidates = `Sicrano\nBeltrano`
+  const exampleCandidates = `Sicrano\nBeltrano\n[Branco]\n[Nulo]`
 
   const defaultElectionName = 'Eleição para Presidente'
   const defaultAdministratorEmail = 'crivano@trf2.jus.br'
   const defaultVoters = `Renato Crivano: crivano@trf2.jus.br\nJoão Luís: joaoluis@trf2.jus.br`
-  const defaultCandidates = `Fulano\nSicrano\nBeltrano`
+  const defaultCandidates = `Fulano\nSicrano\nBeltrano\n[Branco]\n[Nulo]`
 
   const [electionName, setElectionName] = useState(defaultElectionName)
   const [administratorEmail, setAdministratorEmail] = useState(defaultAdministratorEmail)
@@ -41,8 +41,10 @@ export default function Create(props) {
 
   const handleClickCreate = async () => {
     setCreating(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
-    setCreated(true)
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
+      setCreated(true)
+    } catch (e) { }
     setCreating(false)
   };
 
@@ -91,7 +93,7 @@ export default function Create(props) {
                   <Form.Label>Candidatos</Form.Label>
                   <Form.Control as="textarea" rows="10" value={candidates} onChange={handleChangeCandidates} placeholder={exampleCandidates} />
                   <Form.Text className="text-muted">
-                    Em cada linha informe o nome de um candidato.
+                    Em cada linha informe o nome de um candidato. Inclua candidados com os nomes [Branco] e [Nulo], se for o caso.
                   </Form.Text>
                 </Form.Group>
               </div>

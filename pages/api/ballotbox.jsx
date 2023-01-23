@@ -33,9 +33,11 @@ export default async function handler(req, res) {
 
     const result = { electionId: election.id, electionName: election.name, electionStart: election.start, electionEnd: election.end, voterId: voter.id, voterName: voter.name, voteDatetime: voter.voteDatetime, voteIp: voter.voteIp, candidates: [] }
 
-    election.candidates.forEach(c => result.candidates.push({ id: c.id, name: c.name }))
+    election.candidates.forEach(c => { if (c.name.charAt(0) !== '[') result.candidates.push({ id: c.id, name: c.name }) })
 
     shuffle(result.candidates)
+
+    election.candidates.forEach(c => { if (c.name.charAt(0) === '[') result.candidates.push({ id: c.id, name: c.name }) })
 
     res.status(200).json(result);
 }

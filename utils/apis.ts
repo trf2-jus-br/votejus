@@ -49,13 +49,13 @@ export function apiHandler(handler: ApiMethodHandlers) {
             // check if handler supports current HTTP method
             if (!method)
                 throw new createHttpError.MethodNotAllowed(
-                    `No method specified on path ${req.url}!`
+                    `Nenhum método disponível no caminho ${req.url}!`
                 );
 
             const methodHandler = handler[method];
             if (!methodHandler)
                 throw new createHttpError.MethodNotAllowed(
-                    `Method ${req.method} Not Allowed on path ${req.url}!`
+                    `Método ${req.method} não permitido no caminho ${req.url}!`
                 );
 
             // call method handler

@@ -32,9 +32,11 @@ export default function Vote(props) {
 
   const handleClickVote = async () => {
     setVoting(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
+      router.refresh()
+    } catch (e) { }
     setVoting(false)
-    router.refresh()
   };
 
   const candidateRows = props.data.candidates.map((c, idx) => {
@@ -53,7 +55,7 @@ export default function Vote(props) {
 
       {props.data.voteDatetime
         ? <>
-          <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto secreto foi registrado no dia {voteDate} às {voteTime}.</p>
+          <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
         </>
         : <>
           <p>Prezado(a) {props.data.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>

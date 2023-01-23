@@ -2,6 +2,7 @@ export default {
     fetcher: (...args) => fetch(...args).then(res => res.json()),
 
     async post(url, body, params) {
+        let errorMsg = undefined
         try {
             const res = await fetch(`${url}`, {
                 method: 'POST',
@@ -12,17 +13,20 @@ export default {
                 }
             });
             const data = await res.json()
-            if (res.status === 500) {
-                if (params && params.setErrorMessage) {
-                    if (data && data.error && data.error.err) {
-                        params.setErrorMessage(data.error.err)
-                    }
-                    else params.setErrorMessage("Indisponibilidade de sistema.")
-                }
+            if (res.status !== 200) {
+                if (data && data.error && data.error.err) errorMsg = data.error.err
+                else if (data && data.error && data.error.message) errorMsg = data.error.message
+                else errorMsg = "Indisponibilidade de sistema."
             }
             return data
         } catch (ex) {
-            if (params && params.setErrorMessage) params.setErrorMessage("Ocorreu uma indisponibilidade.")
+            errorMsg = "Ocorreu uma indisponibilidade."
+        }
+        finally {
+            if (errorMsg) {
+                if (params && params.setErrorMessage) params.setErrorMessage(errorMsg)
+                throw errorMsg
+            }
         }
     }
 
