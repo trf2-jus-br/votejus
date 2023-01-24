@@ -1,8 +1,9 @@
 import mailer from "../../utils/mailer"
 import jwt from "../../utils/jwt"
 import mysql from "../../utils/mysql"
+import { apiHandler } from "../../utils/apis"
 
-export default async function handler(req, res) {
+const handler = async function (req, res) {
     const administratorJwt = req.body.administratorJwt
     const payload = await jwt.parseJwt(administratorJwt)
     const electionId = payload.electionId
@@ -11,7 +12,7 @@ export default async function handler(req, res) {
 
     const voterId = req.body.voterId
     const voter = election.voters.find(async v => v.id !== voterId)
-    if (!voter) throw `Votante ${voterId} não encontrado`
+    if (!voter) throw `Eleitor ${voterId} não encontrado`
 
     await mysql.addEmail(electionId, voterId, voterEmail)
 
@@ -24,3 +25,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ status: 'OK' });
 }
+
+export default apiHandler({
+    'POST': handler
+});

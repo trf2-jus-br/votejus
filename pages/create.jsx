@@ -58,7 +58,7 @@ export default function Create(props) {
         </>
         : <>
           <p>
-            Para criar uma nova votação, informe o nome da votação, o email do administrador, os nomes e e-mails dos votantes e a lista de candidatos.
+            Para criar uma nova votação, informe o nome da votação, o email do administrador, os nomes e e-mails dos eleitores e a lista de candidatos.
           </p>
 
           <Form>
@@ -81,10 +81,10 @@ export default function Create(props) {
             <div className="row">
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
-                  <Form.Label>Nome e E-mail dos Votantes</Form.Label>
+                  <Form.Label>Nome e E-mail dos Eleitores</Form.Label>
                   <Form.Control as="textarea" rows="10" value={voters} onChange={handleChangeVoters} placeholder={exampleVoters} />
                   <Form.Text className="text-muted">
-                    Em cada linha informe o nome do votante e seu email. Separe o nome do email com dois pontos.
+                    Em cada linha informe o nome do eleitor e seus e-mails. Separe os campos com dois pontos, vírgula ou tab. É possível colar neste campo uma tabela copiada do Excel.
                   </Form.Text>
                 </Form.Group>
               </div>

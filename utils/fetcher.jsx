@@ -14,7 +14,8 @@ export default {
             });
             const data = await res.json()
             if (res.status !== 200) {
-                if (data && data.error && data.error.err) errorMsg = data.error.err
+                if (data && data.error && data.error.err && typeof data.error.err === 'object' && data.error.err !== null && data.error.err.message) errorMsg = data.error.err.message
+                else if (data && data.error && data.error.err && typeof data.error.err === 'string' && data.error.err) errorMsg = data.error.err
                 else if (data && data.error && data.error.message) errorMsg = data.error.message
                 else errorMsg = "Indisponibilidade de sistema."
             }

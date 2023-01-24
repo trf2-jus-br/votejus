@@ -2,7 +2,7 @@
 
 Votejus é um sistema desenvolvido para conduzir votações secretas no âmbito do Tribunal Regional Federal da 2&ordf; Região.
 
-Não serão armazenados dados que possam correlacionar o votante ao candidato. Para cada votante é armazenada apenas a data e hora do voto e, para cada candidato, apenas a quantidade total de votos.
+Não serão armazenados dados que possam correlacionar o eleitor ao candidato. Para cada eleitor é armazenada apenas a data e hora do voto e, para cada candidato, apenas a quantidade total de votos.
 
 Procedimento para implantação:
 

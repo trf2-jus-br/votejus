@@ -9,7 +9,6 @@ import Layout from '../../components/layout'
 export async function getServerSideProps({ params }) {
   const res = await fetch(`${process.env.API_URL_BROWSER}/api/ballotbox?voterJwt=${params.jwt}`);
   const data = await res.json();
-  console.log(data)
   return {
     props: {
       jwt: params.jwt,
@@ -55,7 +54,7 @@ export default function Vote(props) {
 
       {props.data.voteDatetime
         ? <>
-          <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
+          <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto secreto foi registrado no dia {voteDate} às {voteTime}.</p>
         </>
         : <>
           <p>Prezado(a) {props.data.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>

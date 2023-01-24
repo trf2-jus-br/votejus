@@ -69,7 +69,6 @@ export default function Dashboard(props) {
     setSelectedVoterId(voterId)
     setSelectedVoterName(voterName)
     setShowModalResendEmail(true)
-    console.log('open')
   }
 
   const closeModalResendEmail = () => {
@@ -79,7 +78,6 @@ export default function Dashboard(props) {
   }
 
   const handleResendEmail = async () => {
-    console.log('handle')
     try {
       await Fetcher.post(`${props.API_URL_BROWSER}api/resend`, { administratorJwt: props.jwt, voterId: selectedVoterId }, { setErrorMessage })
     } catch (e) { }
@@ -124,11 +122,15 @@ export default function Dashboard(props) {
   const voterPerc = Math.ceil((voteCount / voterCount) * 100)
 
   const voterRows = data.voters.map((v, idx) => {
+    const voteDate = new Date(v.voteDatetime).toLocaleDateString();
+    const voteTime = new Date(v.voteDatetime).toLocaleTimeString();
     return (
       <tr key={v.id}>
         <th scope="row">{idx + 1}</th>
         <td>{v.name}</td>
         <td>{v.email}</td>
+        <td>{v.voteDatetime && <span>{voteDate} às {voteTime}</span>}</td>
+        <td>{v.voteIp}</td>
         <td style={{ textAlign: "right" }}>
           {v.voteDatetime
             ? <span className="text-success font-weight-bold"><FontAwesomeIcon icon={faCircleCheck} /></span>
@@ -154,7 +156,7 @@ export default function Dashboard(props) {
     return (
       <div key={v.id} className="col">
         {v.voteDatetime
-          ? <p className="alert alert-secondary p-2 m-0">{v.name}</p>
+          ? <p className="alert alert-success p-2 m-0">{v.name}</p>
           : data.end
             ? <p className="alert alert-danger p-2 m-0">{v.name}</p>
             : <p className="alert alert-secondary p-2 m-0">{v.name}</p>
@@ -212,13 +214,15 @@ export default function Dashboard(props) {
         }
 
         <div className="mt-4">
-          <h3 className="mb-1">Votantes</h3>
+          <h3 className="mb-1">Eleitores</h3>
           <table className="table table-sm table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Nome</th>
                 <th scope="col">E-mail</th>
+                <th scope="col">Registro</th>
+                <th scope="col">IP</th>
                 <th scope="col" style={{ textAlign: "right" }}>Status</th>
               </tr>
             </thead>

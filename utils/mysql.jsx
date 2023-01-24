@@ -19,27 +19,31 @@ export default {
     async createElection(electionName, administratorEmail, voters, candidates) {
         const conn = await this.getConnection()
         conn.beginTransaction()
+        try {
+            const result = await conn.query('INSERT INTO election(election_name,election_administrator_email) VALUES (?,?);', [electionName, administratorEmail])
+            const electionId = result[0].insertId
 
-        const result = await conn.query('INSERT INTO election(election_name,election_administrator_email) VALUES (?,?);', [electionName, administratorEmail])
-        const electionId = result[0].insertId
+            voters.forEach(async voter => {
+                const result = await conn.query('INSERT INTO voter(election_id,voter_name,voter_email) VALUES (?,?,?);', [electionId, voter.name, voter.email])
+            });
 
-        voters.forEach(async voter => {
-            const result = await conn.query('INSERT INTO voter(election_id,voter_name,voter_email) VALUES (?,?,?);', [electionId, voter.name, voter.email])
-        });
+            candidates.forEach(async cadidate => {
+                const result = await conn.query('INSERT INTO candidate(election_id,candidate_name,candidate_votes) VALUES (?,?,?);', [electionId, cadidate.name, 0])
+            });
 
-        candidates.forEach(async cadidate => {
-            const result = await conn.query('INSERT INTO candidate(election_id,candidate_name,candidate_votes) VALUES (?,?,?);', [electionId, cadidate.name, 0])
-        });
-
-        conn.commit()
-        conn.release()
-        return electionId
+            conn.commit()
+            return electionId
+        } catch (e) {
+            conn.rollback()
+            throw e
+        } finally {
+            conn.release()
+        }
     },
 
     async loadElection(electionId) {
         const conn = await this.getConnection()
         const result = await conn.query('SELECT * FROM election WHERE election_id = ?;', [electionId])
-        conn.release()
 
         const electionName = result[0][0].election_name
         const administratorEmail = result[0][0].election_administrator_email
@@ -55,10 +59,10 @@ export default {
         const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc' : "SUBSTRING(candidate_name, 1, 1) = '[', candidate_name"};`, [electionId])
         const candidates = []
         resultCandidates.forEach(r => {
-            console.log(r)
             candidates.push({ id: r.candidate_id, name: r.candidate_name, votes: (electionEnd ? r.candidate_votes : null) })
         })
 
+        conn.release()
         return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates }
     },
 
@@ -74,7 +78,7 @@ export default {
         conn.release()
     },
 
-    async vote(electionId, voterId, candidateId) {
+    async vote(electionId, voterId, candidateId, voterIp) {
         const conn = await this.getConnection()
         conn.beginTransaction()
 
@@ -87,23 +91,21 @@ export default {
             if (!electionStart) throw `Eleição ${electionName} ainda não está recebendo votos`
             if (electionEnd) throw `Eleição ${electionName} já está encerrada`
 
-            const resultVoter = await conn.query('SELECT * FROM voter WHERE election_id = ? and voter_id = ?;', [electionId, voterId])
-            const voteDatetime = resultVoter[0][0].voter_vote_datetime
+            const [resultVoter] = await conn.query('SELECT * FROM voter WHERE election_id = ? and voter_id = ?;', [electionId, voterId])
+            if (resultVoter.length !== 1) throw `Usuário ${voterId} não encontrado`
 
+            const voteDatetime = resultVoter[0].voter_vote_datetime
             if (voteDatetime) throw `Usuário ${voterId} não pode votar duas vezes`
 
-            // TESTAR SE ELEICAO ESTÁ STARTED E NÃO ESTÁ ENDED
-
-            const result2 = await conn.query('UPDATE voter SET voter_vote_datetime = now() WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;', [electionId, voterId])
-
+            const result2 = await conn.query('UPDATE voter SET voter_vote_datetime = now(), voter_vote_ip = ? WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;', [voterIp, electionId, voterId])
             const result3 = await conn.query('UPDATE candidate SET candidate_votes = candidate_votes + 1 WHERE election_id = ? and candidate_id = ?;', [electionId, candidateId])
-
             conn.commit()
         } catch (e) {
             conn.rollback()
             throw e
+        } finally {
+            conn.release()
         }
-        conn.release()
     },
 
     async addEmail(electionId, voterId, email) {
@@ -131,8 +133,9 @@ export default {
         } catch (e) {
             conn.rollback()
             throw e
+        } finally {
+            conn.release()
         }
-        conn.release()
     }
 
 }

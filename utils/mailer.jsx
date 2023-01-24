@@ -23,7 +23,7 @@ export default {
             if (err) {
                 console.log(err)
             } else {
-                console.log(info);
+                // console.log(info);
             }
         })
     },
@@ -81,7 +81,7 @@ Atenção:
         })
     },
 
-    sendVoteAccepted(email, electionId, electionName, voterName) {
+    sendVoteAccepted(email, electionId, electionName, voterName, voterIp) {
         this.send({
             from: this.from,
             to: email.trim(),
