@@ -29,7 +29,6 @@ const handler = async function (req, res) {
 
     const election = await mysql.loadElection(electionId)
     const voter = election.voters.find(v => v.id === voterId)
-
     if (!voter) throw `Eleitor ${voterId} não encontrado`
 
     const result = { electionId: election.id, electionName: election.name, electionStart: election.start, electionEnd: election.end, voterId: voter.id, voterName: voter.name, voteDatetime: voter.voteDatetime, voteIp: voter.voteIp, candidates: [] }

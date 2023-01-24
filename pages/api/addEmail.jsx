@@ -12,9 +12,8 @@ const handler = async function (req, res) {
     const voterEmail = validate.voterEmail(req.body.voterEmail)
 
     const voterId = req.body.voterId
-    const voter = election.voters.find(async v => v.id !== voterId)
+    const voter = election.voters.find(v => v.id === voterId)
     if (!voter) throw `Eleitor ${voterId} não encontrado`
-
     await mysql.addEmail(electionId, voterId, voterEmail)
 
     const voterJwt = await jwt.buildJwt({ kind: "voter", electionId, voterId })

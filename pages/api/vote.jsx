@@ -12,8 +12,7 @@ const handler = async function (req, res) {
     const ip = req.socket.remoteAddress
 
     const election = await mysql.loadElection(electionId)
-    const voter = election.voters.find(async v => v.id === voterId)
-
+    const voter = election.voters.find(v => v.id === voterId)
     if (!voter) throw `Eleitor ${voterId} não encontrado`
 
     await mysql.vote(electionId, voterId, candidateId, ip)
