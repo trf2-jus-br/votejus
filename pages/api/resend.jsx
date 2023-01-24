@@ -2,7 +2,6 @@ import mailer from "../../utils/mailer"
 import jwt from "../../utils/jwt"
 import mysql from "../../utils/mysql"
 import { apiHandler } from "../../utils/apis";
-import { apiHandler } from "../../utils/apis"
 
 const handler = async function (req, res) {
     const administratorJwt = req.body.administratorJwt

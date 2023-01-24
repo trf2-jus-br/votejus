@@ -2,13 +2,14 @@ import mailer from "../../utils/mailer"
 import jwt from "../../utils/jwt"
 import mysql from "../../utils/mysql"
 import { apiHandler } from "../../utils/apis"
+import validate from '../../utils/validate'
 
 const handler = async function (req, res) {
     const administratorJwt = req.body.administratorJwt
     const payload = await jwt.parseJwt(administratorJwt)
     const electionId = payload.electionId
     const election = await mysql.loadElection(electionId)
-    const voterEmail = req.body.voterEmail.trim().toLowerCase()
+    const voterEmail = validate.voterEmail(req.body.voterEmail)
 
     const voterId = req.body.voterId
     const voter = election.voters.find(async v => v.id !== voterId)

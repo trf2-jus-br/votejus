@@ -12,6 +12,7 @@ export default {
     },
 
     name(s, context, name) {
+        if (!s) throw `Nome de ${name} não informado` + (context ? ' ' + context : '')
         s = s.trim()
         if (!s) throw `Nome de ${name} inválido` + (context ? ' ' + context : '')
         return s
@@ -28,7 +29,8 @@ export default {
     },
 
     email(s, context, name) {
-        s = s.trim()
+        if (!s) throw `E-mail de ${name} não informado` + (context ? ' ' + context : '')
+        s = s.trim().toLowerCase()
         if (!this.validateEmail(s)) throw `E-mail de ${name} inválido` + (context ? ' ' + context : '')
         return s
     },
