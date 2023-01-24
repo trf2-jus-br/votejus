@@ -2,7 +2,6 @@ import mailer from "../../utils/mailer"
 import jwt from "../../utils/jwt"
 import mysql from "../../utils/mysql"
 import { apiHandler } from "../../utils/apis"
-import { validateElectionName, validateAdministratorEmail, validateVoterName, validateVoterEmail, validateCandidateName } from '../../utils/validate'
 import validate from '../../utils/validate'
 
 const handler = async function (req, res) {
