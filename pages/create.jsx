@@ -17,15 +17,15 @@ export async function getServerSideProps({ params }) {
 export default function Create(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
 
-  const exampleElectionName = 'Eleição para Presidente'
+  const exampleElectionName = 'Eleição de Teste'
   const exampleAdministratorEmail = 'nome@empresa.com.br'
-  const exampleVoters = `Fulano: fulano@exemplo.com.br\nBeltrano: beltrano@exemplo.com`
+  const exampleVoters = `Fulano: fulano@trf2.jus.br\nBeltrano: beltrano@trf2.jus.br`
   const exampleCandidates = `Sicrano\nBeltrano\n[Branco]\n[Nulo]`
 
   const defaultElectionName = 'Eleição para Presidente'
-  const defaultAdministratorEmail = 'crivano@trf2.jus.br'
-  const defaultVoters = `Renato Crivano: crivano@trf2.jus.br\nJoão Luís: joaoluis@trf2.jus.br`
-  const defaultCandidates = `Fulano\nSicrano\nBeltrano\n[Branco]\n[Nulo]`
+  const defaultAdministratorEmail = 'administrador@trf2.jus.br'
+  const defaultVoters = `Magistrado 1: magistrado1@trf2.jus.br\nMagistrado 2: magistrado2@trf2.jus.br\nMagistrado 3: magistrado3@trf2.jus.br`
+  const defaultCandidates = `Candidato 1\nCandidato 2\nCandidato 3\n[Branco]\n[Nulo]`
 
   const [electionName, setElectionName] = useState(defaultElectionName)
   const [administratorEmail, setAdministratorEmail] = useState(defaultAdministratorEmail)
