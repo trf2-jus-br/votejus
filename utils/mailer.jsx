@@ -4,6 +4,8 @@ const options = {
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
     secureConnection: false, // TLS requires secureConnection to be false
+    secure: false,
+    ignoreTLS: true,
     tls: {
         rejectUnauthorized: false
     }
@@ -21,17 +23,18 @@ export default {
             if (err) {
                 console.log(err)
             } else {
-                console.log(info);
+                // console.log(info);
             }
         })
     },
 
     footer(electionId) {
         return `
-        Obrigado por utilizar o Votejus.
-        
-        ---
-        TRF2-VOTEJUS-${electionId}`
+
+Obrigado por utilizar o Votejus.
+
+---
+VOTEJUS-${electionId}`
     },
 
     sendCreated(email, electionId, electionName, administratorLink) {
@@ -45,7 +48,9 @@ Utilize o link abaixo para iniciar a votação e acompanhar os resultados.
 
 ${administratorLink}
 
-Atenção: 
+Atenção:
+
+- Os eleitores só reberão um link por e-mail para votar quando a votação for iniciada.
 
 - Não compartilhe este link pois só o administrados da votação deve ter acesso ao link.
 
@@ -62,7 +67,7 @@ Atenção:
 
 A votação "${electionName}" foi iniciada.
 
-Utilize o link abaixo para votar secretamente:
+Utilize o link abaixo para votar sigilosamente:
 
 ${voterLink}
 
@@ -76,14 +81,14 @@ Atenção:
         })
     },
 
-    sendVoteAccepted(email, electionId, electionName, voterName) {
+    sendVoteAccepted(email, electionId, electionName, voterName, voterIp) {
         this.send({
             from: this.from,
             to: email.trim(),
             subject: `${electionName}: Voto Registrado`,
             text: `Prezado(a) ${voterName},
 
-Seu voto secreto foi registrado para a eleição "${electionName}".` + this.footer(electionId)
+Seu voto sigiloso foi registrado para a eleição "${electionName}".` + this.footer(electionId)
         })
     },
 

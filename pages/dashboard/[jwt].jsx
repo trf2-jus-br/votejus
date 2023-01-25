@@ -36,6 +36,7 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
 export default function Dashboard(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
   const [showModalResendEmail, setShowModalResendEmail] = useState(false)
+  const [showModalElectionEnd, setShowModalElectionEnd] = useState(false)
   const [selectedVoterId, setSelectedVoterId] = useState(undefined)
   const [selectedVoterName, setSelectedVoterName] = useState(undefined)
   const [showModalAddEmail, setShowModalAddEmail] = useState(false)
@@ -43,20 +44,31 @@ export default function Dashboard(props) {
   const router = useRouter()
 
   const handleClickStart = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/start`, { administratorJwt: props.jwt }, { setErrorMessage })
-    router.refresh()
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/start`, { administratorJwt: props.jwt }, { setErrorMessage })
+      router.refresh()
+    } catch (e) { }
   };
 
-  const handleClickEnd = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/end`, { administratorJwt: props.jwt }, { setErrorMessage })
-    router.refresh()
+  const handleElectionEnd = async () => {
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/end`, { administratorJwt: props.jwt }, { setErrorMessage })
+      router.refresh()
+    } catch (e) { }
   };
+
+  const openModalElectionEnd = () => {
+    setShowModalElectionEnd(true)
+  }
+
+  const closeModalElectionEnd = () => {
+    setShowModalElectionEnd(false)
+  }
 
   const openModalResendEmail = (voterId, voterName) => {
     setSelectedVoterId(voterId)
     setSelectedVoterName(voterName)
     setShowModalResendEmail(true)
-    console.log('open')
   }
 
   const closeModalResendEmail = () => {
@@ -66,8 +78,9 @@ export default function Dashboard(props) {
   }
 
   const handleResendEmail = async () => {
-    console.log('handle')
-    await Fetcher.post(`${props.API_URL_BROWSER}api/resend`, { administratorJwt: props.jwt, voterId: selectedVoterId }, { setErrorMessage })
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/resend`, { administratorJwt: props.jwt, voterId: selectedVoterId }, { setErrorMessage })
+    } catch (e) { }
     closeModalResendEmail()
   }
 
@@ -84,14 +97,18 @@ export default function Dashboard(props) {
   }
 
   const handleAddEmail = async (voterEmail) => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/addEmail`, { administratorJwt: props.jwt, voterId: selectedVoterId, voterEmail }, { setErrorMessage })
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/addEmail`, { administratorJwt: props.jwt, voterId: selectedVoterId, voterEmail }, { setErrorMessage })
+      router.refresh()
+    } catch (e) { }
     closeModalAddEmail()
-    router.refresh()
   };
 
   const handleAddVoter = async (voterName, voterEmail) => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/addVoter`, { administratorJwt: props.jwt, voterName, voterEmail }, { setErrorMessage })
-    router.refresh()
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/addVoter`, { administratorJwt: props.jwt, voterName, voterEmail }, { setErrorMessage })
+      router.refresh()
+    } catch (e) { }
   };
 
   const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher);
@@ -105,23 +122,27 @@ export default function Dashboard(props) {
   const voterPerc = Math.ceil((voteCount / voterCount) * 100)
 
   const voterRows = data.voters.map((v, idx) => {
+    const voteDate = new Date(v.voteDatetime).toLocaleDateString();
+    const voteTime = new Date(v.voteDatetime).toLocaleTimeString();
     return (
       <tr key={v.id}>
         <th scope="row">{idx + 1}</th>
         <td>{v.name}</td>
         <td>{v.email}</td>
+        <td>{v.voteDatetime && <span>{voteDate} às {voteTime}</span>}</td>
+        <td>{v.voteIp}</td>
         <td style={{ textAlign: "right" }}>
           {v.voteDatetime
             ? <span className="text-success font-weight-bold"><FontAwesomeIcon icon={faCircleCheck} /></span>
             : data.end
               ? <span className="text-danger font-weight-bold"><FontAwesomeIcon icon={faCircleXmark} /></span>
-              : <Dropdown align="end">
+              : <Dropdown align="end" className="d-print-none">
                 <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                   <FontAwesomeIcon icon={faEllipsis} />
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => openModalResendEmail(v.id, v.name)}>Reenviar o e-mail</Dropdown.Item>
+                  {data.start && !data.end && <Dropdown.Item onClick={() => openModalResendEmail(v.id, v.name)}>Reenviar o e-mail</Dropdown.Item>}
                   <Dropdown.Item onClick={() => openModalAddEmail(v.id, v.name)}>Adicionar outro e-mail</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
@@ -131,51 +152,15 @@ export default function Dashboard(props) {
     );
   });
 
-  const voterCardsDel = data.voters.map((v, idx) => {
-    return (
-      <div key={v.id} className="col">
-        <div className="card">
-          <div className="card-header p-2">
-            <div className="row"><div className="col">{v.name}</div>
-              <div className="col-auto">
-                {v.voteDatetime
-                  ? <span className="text-success font-weight-bold"><FontAwesomeIcon icon={faCircleCheck} /></span>
-                  : data.end
-                    ? <span className="text-danger font-weight-bold"><FontAwesomeIcon icon={faCircleXmark} /></span>
-                    : <Dropdown align="end">
-                      <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
-                        <FontAwesomeIcon icon={faEllipsis} />
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Reenviar o E-mail</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Substituir o E-mail</Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                }
-              </div>
-            </div>
-          </div>
-          <div className="card-body p-2">
-            <small className="text-muted">{v.email}</small>
-          </div>
-        </div>
-      </div>
-    );
-  });
-
-
   const voterCards = data.voters.map((v, idx) => {
     return (
       <div key={v.id} className="col">
-        <div className="card">
-
-          {v.voteDatetime
-            ? <div className="card-header p-2 m-0 alert alert-success">{v.name}</div>
-            : data.end
-              ? <div className="card-header p-2 m-0 alert alert-danger">{v.name}</div>
-              : <div className="card-header p-2">{v.name}</div>
-          }
-        </div>
+        {v.voteDatetime
+          ? <p className="alert alert-success p-2 m-0">{v.name}</p>
+          : data.end
+            ? <p className="alert alert-danger p-2 m-0">{v.name}</p>
+            : <p className="alert alert-secondary p-2 m-0">{v.name}</p>
+        }
       </div>
     );
   });
@@ -191,47 +176,53 @@ export default function Dashboard(props) {
     );
   });
 
-
+  const startDate = new Date(data.start).toLocaleDateString();
+  const startTime = new Date(data.start).toLocaleTimeString();
+  const endDate = new Date(data.end).toLocaleDateString();
+  const endTime = new Date(data.end).toLocaleTimeString();
 
   return (
     <SWRConfig value={{ refreshInterval: 2000 }}>
       <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
+        <h4 className='mb-0 text-end'>VOTEJUS-{data.id}</h4>
         <h1 className='mb-4'>{data.name}</h1>
 
         <div>
-          <p className="mb-1">
-            Votos recebidos até o momento: {voteCount}/{voterCount}
-          </p>
-
-          <div className="progress" role="progressbar" aria-label="Votos recebidos" aria-valuenow={voterPerc} aria-valuemin="0" aria-valuemax="100">
+          {data.start && <p className="mb-1">Início: {startDate} às {startTime}</p>}
+          <p className="mb-1">Votos recebidos: {voteCount}/{voterCount}</p>
+          <div className="progress d-print-none" role="progressbar" aria-label="Votos recebidos" aria-valuenow={voterPerc} aria-valuemin="0" aria-valuemax="100">
             <div className="progress-bar bg-info" style={{ width: voterPerc + "%" }}></div>
           </div>
+          {data.end && <p className="mb-1">Término: {endDate} às {endTime}</p>}
         </div>
 
         {
           !data.start &&
-          <div className="mt-4">
+          <div className="mt-4 d-print-none">
+            <p className="alert alert-warning">Clique no botão abaixo para iniciar a votação. O sistema enviará emails a todos os eleitores solicitando que registrem seus votos.</p>
             <Button as="a" variant="primary" onClick={handleClickStart}> Iniciar a Votação </Button>
           </div>
         }
 
         {data.start && !data.end &&
-          <>
+          <div className="d-print-none">
             <h3 className="mb-1 mt-4">Painel de Acompanhamento</h3>
-            <div className="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-4">
+            <div className="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-0">
               {voterCards}
             </div>
-          </>
+          </div>
         }
 
         <div className="mt-4">
-          <h3 className="mb-1">Votantes</h3>
+          <h3 className="mb-1">Eleitores</h3>
           <table className="table table-sm table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Nome</th>
                 <th scope="col">E-mail</th>
+                <th scope="col">Registro</th>
+                <th scope="col">IP</th>
                 <th scope="col" style={{ textAlign: "right" }}>Status</th>
               </tr>
             </thead>
@@ -243,8 +234,9 @@ export default function Dashboard(props) {
 
         {
           data.start && !data.end &&
-          <div className="mt-4">
-            <Button as="a" variant="warning" onClick={handleClickEnd}> Finalizar a Votação </Button>
+          <div className="mt-4 d-print-none">
+            <p className="alert alert-warning">Clique no botão abaixo para terminar a votação. O sistema interromperá o recebimento de votos e apresentará o resultado.</p>
+            <Button as="a" variant="danger" onClick={openModalElectionEnd}> Finalizar a Votação </Button>
           </div>
         }
 
@@ -264,6 +256,7 @@ export default function Dashboard(props) {
           </table>
         </div>
 
+        <ModalOkCancel show={showModalElectionEnd} onOk={handleElectionEnd} onCancel={closeModalElectionEnd} title="Finalizar Votação" text={`Atenção, esta operação não poderá ser revertida. Tem certeza que deseja finalizar a votação?`} />
         <ModalOkCancel show={showModalResendEmail} onOk={handleResendEmail} onCancel={closeModalResendEmail} title="Reenvio de Email" text={`Deseja reenviar o email para ${selectedVoterName}?`} />
         <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
 

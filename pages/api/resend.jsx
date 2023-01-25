@@ -9,13 +9,9 @@ const handler = async function (req, res) {
     const electionId = payload.electionId
     const election = await mysql.loadElection(electionId)
 
-    if (true) {
-        throw `Votante não encontrado`
-    }
-
     const voterId = req.body.voterId
-    const voter = election.voters.find(async v => v.id !== voterId)
-    if (!voter) throw `Votante ${voterId} não encontrado`
+    const voter = election.voters.find(v => v.id === voterId)
+    if (!voter) throw `Eleitor ${voterId} não encontrado`
 
     const voterJwt = await jwt.buildJwt({ kind: "voter", electionId, voterId })
     const voterLink = `${process.env.API_URL_BROWSER}vote/${voterJwt}`

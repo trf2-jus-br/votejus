@@ -1,6 +1,7 @@
 import mailer from "../../utils/mailer"
 import jwt from "../../utils/jwt"
 import mysql from "../../utils/mysql"
+import { apiHandler } from "../../utils/apis"
 
 const shuffle = function (array) {
     let currentIndex = array.length, randomIndex;
@@ -20,7 +21,7 @@ const shuffle = function (array) {
     return array;
 }
 
-export default async function handler(req, res) {
+const handler = async function (req, res) {
     const voterJwt = req.query.voterJwt
     const payload = await jwt.parseJwt(voterJwt)
     const electionId = payload.electionId
@@ -28,14 +29,19 @@ export default async function handler(req, res) {
 
     const election = await mysql.loadElection(electionId)
     const voter = election.voters.find(v => v.id === voterId)
-
-    if (!voter) throw `Votante ${voterId} não encontrado`
+    if (!voter) throw `Eleitor ${voterId} não encontrado`
 
     const result = { electionId: election.id, electionName: election.name, electionStart: election.start, electionEnd: election.end, voterId: voter.id, voterName: voter.name, voteDatetime: voter.voteDatetime, voteIp: voter.voteIp, candidates: [] }
 
-    election.candidates.forEach(c => result.candidates.push({ id: c.id, name: c.name }))
+    election.candidates.forEach(c => { if (c.name.charAt(0) !== '[') result.candidates.push({ id: c.id, name: c.name }) })
 
     shuffle(result.candidates)
 
+    election.candidates.forEach(c => { if (c.name.charAt(0) === '[') result.candidates.push({ id: c.id, name: c.name }) })
+
     res.status(200).json(result);
 }
+
+export default apiHandler({
+    'GET': handler
+});

@@ -16,23 +16,38 @@ export async function getServerSideProps({ params }) {
 
 export default function Create(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
-  
-  const exampleElectionName = 'Eleição para Presidente'
-  const exampleAdministratorEmail = 'nome@empresa.com.br'
-  const exampleVoters = `Fulano: fulano@exemplo.com.br\nBeltrano: beltrano@exemplo.com`
-  const exampleCandidates = `Sicrano\nBeltrano`
 
-  const defaultElectionName = 'Eleição para Presidente'
-  const defaultAdministratorEmail = 'crivano@trf2.jus.br'
-  const defaultVoters = `Renato Crivano: crivano@trf2.jus.br\nJoão Luís: joao.luis@trf2.jus.br`
-  const defaultCandidates = `Fulano\nSicrano\nBeltrano`
+  const exampleElectionName = 'Eleição de Teste'
+  const exampleAdministratorEmail = 'administrador@empresa.com.br'
+  const exampleVoters = `Fulano: fulano@empresa.com.br\nBeltrano: beltrano@empresa.com.br`
+  const exampleCandidates = `Sicrano\nBeltrano\n[Branco]\n[Nulo]`
 
-  const [electionName, setElectionName] = useState(defaultElectionName)
-  const [administratorEmail, setAdministratorEmail] = useState(defaultAdministratorEmail)
-  const [voters, setVoters] = useState(defaultVoters)
-  const [candidates, setCandidates] = useState(defaultCandidates)
+  const [electionName, setElectionName] = useState(undefined)
+  const [administratorEmail, setAdministratorEmail] = useState(undefined)
+  const [voters, setVoters] = useState(undefined)
+  const [candidates, setCandidates] = useState(undefined)
   const [creating, setCreating] = useState(false)
   const [created, setCreated] = useState(false)
+
+  // Load fields from localStorage
+  React.useEffect(() => {
+    let defaultElectionName = localStorage.getItem('electionName')
+    if (defaultElectionName && !electionName) {
+      // Acrescenta um sufixo ' #2' para diferenciar
+      const regex = / #([0-9])+$/
+      if (regex.test(defaultElectionName))
+        defaultElectionName = defaultElectionName.replace(regex, (match, num) => ` #${parseInt(num) + 1}`)
+      else
+        defaultElectionName += ' #2'
+      setElectionName(defaultElectionName)
+    }
+    const defaultAdministratorEmail = localStorage.getItem('administratorEmail')
+    if (defaultAdministratorEmail && !administratorEmail) setAdministratorEmail(defaultAdministratorEmail)
+    const defaultVoters = localStorage.getItem('voters')
+    if (defaultVoters && !voters) setVoters(defaultVoters)
+    const defaultCandidates = localStorage.getItem('candidates')
+    if (defaultCandidates && !candidates) setCandidates(defaultCandidates)
+  }, [])
 
   const handleChangeElectionName = (evt) => { setElectionName(evt.target.value) };
   const handleChangeAdministratorEmail = (evt) => { setAdministratorEmail(evt.target.value) };
@@ -41,8 +56,14 @@ export default function Create(props) {
 
   const handleClickCreate = async () => {
     setCreating(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
-    setCreated(true)
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
+      localStorage.setItem('electionName', electionName)
+      localStorage.setItem('administratorEmail', administratorEmail)
+      localStorage.setItem('voters', voters)
+      localStorage.setItem('candidates', candidates)
+      setCreated(true)
+    } catch (e) { }
     setCreating(false)
   };
 
@@ -56,7 +77,7 @@ export default function Create(props) {
         </>
         : <>
           <p>
-            Para criar uma nova votação, informe o nome da votação, o email do administrador, os nomes e e-mails dos votantes e a lista de candidatos.
+            Para criar uma nova votação, informe o nome da votação, o email do administrador, os nomes e e-mails dos eleitores e a lista de candidatos.
           </p>
 
           <Form>
@@ -79,10 +100,10 @@ export default function Create(props) {
             <div className="row">
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
-                  <Form.Label>Nome e E-mail dos Votantes</Form.Label>
+                  <Form.Label>Nome e E-mail dos Eleitores</Form.Label>
                   <Form.Control as="textarea" rows="10" value={voters} onChange={handleChangeVoters} placeholder={exampleVoters} />
                   <Form.Text className="text-muted">
-                    Em cada linha informe o nome do votante e seu email. Separe o nome do email com dois pontos.
+                    Em cada linha informe o nome do eleitor e seus e-mails. Separe os campos com dois pontos, vírgula ou tab. É possível colar neste campo uma tabela copiada do Excel.
                   </Form.Text>
                 </Form.Group>
               </div>
@@ -91,7 +112,7 @@ export default function Create(props) {
                   <Form.Label>Candidatos</Form.Label>
                   <Form.Control as="textarea" rows="10" value={candidates} onChange={handleChangeCandidates} placeholder={exampleCandidates} />
                   <Form.Text className="text-muted">
-                    Em cada linha informe o nome de um candidato.
+                    Em cada linha informe o nome de um candidato. Inclua candidados com os nomes [Branco] e [Nulo], se for o caso.
                   </Form.Text>
                 </Form.Group>
               </div>

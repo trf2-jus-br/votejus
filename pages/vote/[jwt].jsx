@@ -9,7 +9,6 @@ import Layout from '../../components/layout'
 export async function getServerSideProps({ params }) {
   const res = await fetch(`${process.env.API_URL_BROWSER}/api/ballotbox?voterJwt=${params.jwt}`);
   const data = await res.json();
-  console.log(data)
   return {
     props: {
       jwt: params.jwt,
@@ -32,8 +31,10 @@ export default function Vote(props) {
 
   const handleClickVote = async () => {
     setVoting(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
-    router.refresh()
+    try {
+      await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
+      router.refresh()
+    } catch (e) { }
     setVoting(false)
   };
 
