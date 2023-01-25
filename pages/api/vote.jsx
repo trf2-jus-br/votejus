@@ -10,8 +10,9 @@ const handler = async function (req, res) {
     const voterId = payload.voterId
     const candidateId = req.body.candidateId
     const xFormardedFor = req.headers['x-forwarded-for']
+    const xFormardedForFirstIp = xFormardedFor ? xFormardedFor.split(', ')[0] : undefined
     const remoteAddress = req.socket.remoteAddress
-    const ip = xFormardedFor ? xFormardedFor : remoteAddress
+    const ip = xFormardedFor ? xFormardedForFirstIp : remoteAddress
 
     const election = await mysql.loadElection(electionId)
     const voter = election.voters.find(v => v.id === voterId)
