@@ -6,7 +6,7 @@ Não serão armazenados dados que possam correlacionar o votante ao candidato. P
 
 Procedimento para implantação:
 
-- Disponibilizar um banco de dados MySQL e executar o script migration.sql
+- Disponibilizar um banco de dados MySQL e executar o script migration-001.sql.
 
 - Configurar as propriedades de ambiente para controle de acesso:
   - JWT_SECRET=***SUBSTITUIA_POR_UM_UUID_ALEATÓRIO***
