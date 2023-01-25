@@ -25,7 +25,13 @@ export default {
     },
 
     administratorEmail(s, context) {
-        return this.email(s, context, 'administrador')
+        const email = this.email(s, context, 'administrador')
+        const adminEmailRegex = process.env.ADMIN_EMAIL_REGEX
+        if (adminEmailRegex) {
+            const regex = new RegExp(adminEmailRegex, '')
+            if (!regex.test(email)) throw `E-mail de administrador não permitido`
+        }
+        return email
     },
 
     email(s, context, name) {
