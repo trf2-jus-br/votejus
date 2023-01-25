@@ -111,7 +111,7 @@ export default function Dashboard(props) {
     } catch (e) { }
   };
 
-  const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher);
+  const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher, { refreshInterval: 2000 });
 
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>
@@ -182,85 +182,83 @@ export default function Dashboard(props) {
   const endTime = new Date(data.end).toLocaleTimeString();
 
   return (
-    <SWRConfig value={{ refreshInterval: 2000 }}>
-      <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
-        <h4 className='mb-0 text-end'>VOTEJUS-{data.id}</h4>
-        <h1 className='mb-4'>{data.name}</h1>
+    <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
+      <h4 className='mb-0 text-end'>VOTEJUS-{data.id}</h4>
+      <h1 className='mb-4'>{data.name}</h1>
 
-        <div>
-          {data.start && <p className="mb-1">Início: {startDate} às {startTime}</p>}
-          <p className="mb-1">Votos recebidos: {voteCount}/{voterCount}</p>
-          <div className="progress d-print-none" role="progressbar" aria-label="Votos recebidos" aria-valuenow={voterPerc} aria-valuemin="0" aria-valuemax="100">
-            <div className="progress-bar bg-info" style={{ width: voterPerc + "%" }}></div>
-          </div>
-          {data.end && <p className="mb-1">Término: {endDate} às {endTime}</p>}
+      <div>
+        {data.start && <p className="mb-1">Início: {startDate} às {startTime}</p>}
+        <p className="mb-1">Votos recebidos: {voteCount}/{voterCount}</p>
+        <div className="progress d-print-none" role="progressbar" aria-label="Votos recebidos" aria-valuenow={voterPerc} aria-valuemin="0" aria-valuemax="100">
+          <div className="progress-bar bg-info" style={{ width: voterPerc + "%" }}></div>
         </div>
+        {data.end && <p className="mb-1">Término: {endDate} às {endTime}</p>}
+      </div>
 
-        {
-          !data.start &&
-          <div className="mt-4 d-print-none">
-            <p className="alert alert-warning">Clique no botão abaixo para iniciar a votação. O sistema enviará emails a todos os eleitores solicitando que registrem seus votos.</p>
-            <Button as="a" variant="primary" onClick={handleClickStart}> Iniciar a Votação </Button>
-          </div>
-        }
-
-        {data.start && !data.end &&
-          <div className="d-print-none">
-            <h3 className="mb-1 mt-4">Painel de Acompanhamento</h3>
-            <div className="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-0">
-              {voterCards}
-            </div>
-          </div>
-        }
-
-        <div className="mt-4">
-          <h3 className="mb-1">Eleitores</h3>
-          <table className="table table-sm table-striped">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nome</th>
-                <th scope="col">E-mail</th>
-                <th scope="col">Registro</th>
-                <th scope="col">IP</th>
-                <th scope="col" style={{ textAlign: "right" }}>Status</th>
-              </tr>
-            </thead>
-            <tbody className="table-group-divider">
-              {voterRows}
-            </tbody>
-          </table>
+      {
+        !data.start &&
+        <div className="mt-4 d-print-none">
+          <p className="alert alert-warning">Clique no botão abaixo para iniciar a votação. O sistema enviará emails a todos os eleitores solicitando que registrem seus votos.</p>
+          <Button as="a" variant="primary" onClick={handleClickStart}> Iniciar a Votação </Button>
         </div>
+      }
 
-        {
-          data.start && !data.end &&
-          <div className="mt-4 d-print-none">
-            <p className="alert alert-warning">Clique no botão abaixo para terminar a votação. O sistema interromperá o recebimento de votos e apresentará o resultado.</p>
-            <Button as="a" variant="danger" onClick={openModalElectionEnd}> Finalizar a Votação </Button>
+      {data.start && !data.end &&
+        <div className="d-print-none">
+          <h3 className="mb-1 mt-4">Painel de Acompanhamento</h3>
+          <div className="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-0">
+            {voterCards}
           </div>
-        }
-
-        <div className="mt-4">
-          <h3 className="mb-1">Candidatos</h3>
-          <table className="table table-sm table-striped">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nome</th>
-                <th scope="col" style={{ textAlign: "right" }}>Votos</th>
-              </tr>
-            </thead>
-            <tbody className="table-group-divider">
-              {candidateRows}
-            </tbody>
-          </table>
         </div>
+      }
 
-        <ModalOkCancel show={showModalElectionEnd} onOk={handleElectionEnd} onCancel={closeModalElectionEnd} title="Finalizar Votação" text={`Atenção, esta operação não poderá ser revertida. Tem certeza que deseja finalizar a votação?`} />
-        <ModalOkCancel show={showModalResendEmail} onOk={handleResendEmail} onCancel={closeModalResendEmail} title="Reenvio de Email" text={`Deseja reenviar o email para ${selectedVoterName}?`} />
-        <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
+      <div className="mt-4">
+        <h3 className="mb-1">Eleitores</h3>
+        <table className="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nome</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Registro</th>
+              <th scope="col">IP</th>
+              <th scope="col" style={{ textAlign: "right" }}>Status</th>
+            </tr>
+          </thead>
+          <tbody className="table-group-divider">
+            {voterRows}
+          </tbody>
+        </table>
+      </div>
 
-      </Layout>
-    </SWRConfig>
+      {
+        data.start && !data.end &&
+        <div className="mt-4 d-print-none">
+          <p className="alert alert-warning">Clique no botão abaixo para terminar a votação. O sistema interromperá o recebimento de votos e apresentará o resultado.</p>
+          <Button as="a" variant="danger" onClick={openModalElectionEnd}> Finalizar a Votação </Button>
+        </div>
+      }
+
+      <div className="mt-4">
+        <h3 className="mb-1">Candidatos</h3>
+        <table className="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nome</th>
+              <th scope="col" style={{ textAlign: "right" }}>Votos</th>
+            </tr>
+          </thead>
+          <tbody className="table-group-divider">
+            {candidateRows}
+          </tbody>
+        </table>
+      </div>
+
+      <ModalOkCancel show={showModalElectionEnd} onOk={handleElectionEnd} onCancel={closeModalElectionEnd} title="Finalizar Votação" text={`Atenção, esta operação não poderá ser revertida. Tem certeza que deseja finalizar a votação?`} />
+      <ModalOkCancel show={showModalResendEmail} onOk={handleResendEmail} onCancel={closeModalResendEmail} title="Reenvio de Email" text={`Deseja reenviar o email para ${selectedVoterName}?`} />
+      <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
+
+    </Layout>
   )
 }
