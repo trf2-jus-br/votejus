@@ -15,6 +15,8 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function Create(props) {
+  const form = React.createRef()
+  const [validated, setValidated] = useState(false)
   const [errorMessage, setErrorMessage] = useState(undefined)
 
   const exampleElectionName = 'Eleição de Teste'
@@ -55,17 +57,25 @@ export default function Create(props) {
   const handleChangeCandidates = (evt) => { setCandidates(evt.target.value) };
 
   const handleClickCreate = async () => {
-    setCreating(true)
-    try {
-      await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
-      localStorage.setItem('electionName', electionName)
-      localStorage.setItem('administratorEmail', administratorEmail)
-      localStorage.setItem('voters', voters)
-      localStorage.setItem('candidates', candidates)
-      setCreated(true)
-    } catch (e) { }
-    setCreating(false)
-  };
+    setValidated(true)
+    if (form.current.checkValidity()) {
+      setCreating(true)
+      try {
+        await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
+        localStorage.setItem('electionName', electionName)
+        localStorage.setItem('administratorEmail', administratorEmail)
+        localStorage.setItem('voters', voters)
+        localStorage.setItem('candidates', candidates)
+        setCreated(true)
+        setCreating(false)
+        setElectionName(undefined)
+        setAdministratorEmail(undefined)
+        setVoters(undefined)
+        setCandidates(undefined)
+        setValidated(false)
+      } catch (e) { }
+    }
+  }
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
@@ -80,19 +90,21 @@ export default function Create(props) {
             Para criar uma nova votação, informe o nome da votação, o email do administrador, os nomes e e-mails dos eleitores e a lista de candidatos.
           </p>
 
-          <Form>
+          <Form validated={validated} ref={form}>
 
             <div className="row">
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="electionName">
                   <Form.Label>Nome da Eleição</Form.Label>
-                  <Form.Control type="text" value={electionName} onChange={handleChangeElectionName} placeholder={exampleElectionName} />
+                  <Form.Control type="text" value={electionName} onChange={handleChangeElectionName} placeholder={exampleElectionName} required />
+                  <Form.Control.Feedback type="invalid">Informe um nome válido.</Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="administratorEmail">
                   <Form.Label>E-mail do Administrador</Form.Label>
-                  <Form.Control type="email" value={administratorEmail} onChange={handleChangeAdministratorEmail} placeholder={exampleAdministratorEmail} />
+                  <Form.Control type="email" value={administratorEmail} onChange={handleChangeAdministratorEmail} placeholder={exampleAdministratorEmail} required />
+                  <Form.Control.Feedback type="invalid">Informe um email válido.</Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
@@ -101,19 +113,21 @@ export default function Create(props) {
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
                   <Form.Label>Nome e E-mail dos Eleitores</Form.Label>
-                  <Form.Control as="textarea" rows="10" value={voters} onChange={handleChangeVoters} placeholder={exampleVoters} />
+                  <Form.Control as="textarea" rows="10" value={voters} onChange={handleChangeVoters} placeholder={exampleVoters} required />
                   <Form.Text className="text-muted">
                     Em cada linha informe o nome do eleitor e seus e-mails. Separe os campos com dois pontos, vírgula ou tab. É possível colar neste campo uma tabela copiada do Excel.
                   </Form.Text>
+                  <Form.Control.Feedback type="invalid">Lista de eleitores deve ser preenchida.</Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
                   <Form.Label>Candidatos</Form.Label>
-                  <Form.Control as="textarea" rows="10" value={candidates} onChange={handleChangeCandidates} placeholder={exampleCandidates} />
+                  <Form.Control as="textarea" rows="10" value={candidates} onChange={handleChangeCandidates} placeholder={exampleCandidates} required />
                   <Form.Text className="text-muted">
                     Em cada linha informe o nome de um candidato. Inclua candidados com os nomes [Branco] e [Nulo], se for o caso.
                   </Form.Text>
+                  <Form.Control.Feedback type="invalid">Lista de candidatos deve ser preenchida.</Form.Control.Feedback>
                 </Form.Group>
               </div>
             </div>
