@@ -18,21 +18,36 @@ export default function Create(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
 
   const exampleElectionName = 'Eleição de Teste'
-  const exampleAdministratorEmail = 'nome@empresa.com.br'
+  const exampleAdministratorEmail = 'administrador@trf2.jus.br'
   const exampleVoters = `Fulano: fulano@trf2.jus.br\nBeltrano: beltrano@trf2.jus.br`
   const exampleCandidates = `Sicrano\nBeltrano\n[Branco]\n[Nulo]`
 
-  const defaultElectionName = 'Eleição para Presidente'
-  const defaultAdministratorEmail = 'administrador@trf2.jus.br'
-  const defaultVoters = `Magistrado 1: magistrado1@trf2.jus.br\nMagistrado 2: magistrado2@trf2.jus.br\nMagistrado 3: magistrado3@trf2.jus.br`
-  const defaultCandidates = `Candidato 1\nCandidato 2\nCandidato 3\n[Branco]\n[Nulo]`
-
-  const [electionName, setElectionName] = useState(defaultElectionName)
-  const [administratorEmail, setAdministratorEmail] = useState(defaultAdministratorEmail)
-  const [voters, setVoters] = useState(defaultVoters)
-  const [candidates, setCandidates] = useState(defaultCandidates)
+  const [electionName, setElectionName] = useState(undefined)
+  const [administratorEmail, setAdministratorEmail] = useState(undefined)
+  const [voters, setVoters] = useState(undefined)
+  const [candidates, setCandidates] = useState(undefined)
   const [creating, setCreating] = useState(false)
   const [created, setCreated] = useState(false)
+
+  // Load fields from localStorage
+  React.useEffect(() => {
+    let defaultElectionName = localStorage.getItem('electionName')
+    if (defaultElectionName && !electionName) {
+      // Acrescenta um sufixo ' #2' para diferenciar
+      const regex = / #([0-9])+$/
+      if (regex.test(defaultElectionName))
+        defaultElectionName = defaultElectionName.replace(regex, (match, num) => ` #${parseInt(num) + 1}`)
+      else
+        defaultElectionName += ' #2'
+      setElectionName(defaultElectionName)
+    }
+    const defaultAdministratorEmail = localStorage.getItem('administratorEmail')
+    if (defaultAdministratorEmail && !administratorEmail) setAdministratorEmail(defaultAdministratorEmail)
+    const defaultVoters = localStorage.getItem('voters')
+    if (defaultVoters && !voters) setVoters(defaultVoters)
+    const defaultCandidates = localStorage.getItem('candidates')
+    if (defaultCandidates && !candidates) setCandidates(defaultCandidates)
+  }, [])
 
   const handleChangeElectionName = (evt) => { setElectionName(evt.target.value) };
   const handleChangeAdministratorEmail = (evt) => { setAdministratorEmail(evt.target.value) };
@@ -43,6 +58,10 @@ export default function Create(props) {
     setCreating(true)
     try {
       await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
+      localStorage.setItem('electionName', electionName)
+      localStorage.setItem('administratorEmail', administratorEmail)
+      localStorage.setItem('voters', voters)
+      localStorage.setItem('candidates', candidates)
       setCreated(true)
     } catch (e) { }
     setCreating(false)
