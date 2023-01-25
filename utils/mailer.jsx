@@ -34,7 +34,7 @@ export default {
 Obrigado por utilizar o Votejus.
 
 ---
-TRF2-VOTEJUS-${electionId}`
+VOTEJUS-${electionId}`
     },
 
     sendCreated(email, electionId, electionName, administratorLink) {

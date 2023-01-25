@@ -18,8 +18,8 @@ export default function Create(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
 
   const exampleElectionName = 'Eleição de Teste'
-  const exampleAdministratorEmail = 'administrador@trf2.jus.br'
-  const exampleVoters = `Fulano: fulano@trf2.jus.br\nBeltrano: beltrano@trf2.jus.br`
+  const exampleAdministratorEmail = 'administrador@empresa.com.br'
+  const exampleVoters = `Fulano: fulano@empresa.com.br\nBeltrano: beltrano@empresa.com.br`
   const exampleCandidates = `Sicrano\nBeltrano\n[Branco]\n[Nulo]`
 
   const [electionName, setElectionName] = useState(undefined)

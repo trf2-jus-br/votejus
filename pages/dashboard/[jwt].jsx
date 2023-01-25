@@ -184,7 +184,7 @@ export default function Dashboard(props) {
   return (
     <SWRConfig value={{ refreshInterval: 2000 }}>
       <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
-        <h4 className='mb-0 text-end'>TRF2-VOTEJUS-{data.id}</h4>
+        <h4 className='mb-0 text-end'>VOTEJUS-{data.id}</h4>
         <h1 className='mb-4'>{data.name}</h1>
 
         <div>

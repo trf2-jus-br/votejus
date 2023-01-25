@@ -8,23 +8,27 @@ Procedimento para implantação:
 
 - Disponibilizar um banco de dados MySQL e executar o script migration.sql
 
-- Configurar as propriedades de ambiente para controle de acesso:
-  - JWT_SECRET=***SUBSTITUIA_POR_UM_UUID_ALEATÓRIO***
-  - JWT_EXPIRATION_TIME=24h
+- Configurar as propriedades de ambiente:
+  - Para controle de acesso:
+    - JWT_SECRET=***SUBSTITUIA_POR_UM_UUID_ALEATÓRIO***
+    - JWT_EXPIRATION_TIME=24h
   
-- Configurar as propriedades de ambiente para acesso ao servidor de email:
-  - SMTP_FROM=votejus@empresa.com.br
-  - SMTP_HOST=smtp.empresa.com.br
-  - SMTP_PORT=25
-  - SMTP_USER=
-  - SMTP_PASSWORD=
+  - Para acesso ao servidor de email:
+    - SMTP_FROM=votejus@empresa.com.br
+    - SMTP_HOST=smtp.empresa.com.br
+    - SMTP_PORT=25
+    - SMTP_USER=
+    - SMTP_PASSWORD=
 
-- Configurar as propriedades de ambiente para acesso ao servidor de banco de dados:
-  - MYSQL_HOST=localhost
-  - MYSQL_PORT=3306
-  - MYSQL_USER=root
-  - MYSQL_PASSWORD=
-  - MYSQL_DATABASE=votejus
+  - Para acesso ao servidor de banco de dados:
+    - MYSQL_HOST=localhost
+    - MYSQL_PORT=3306
+    - MYSQL_USER=root
+    - MYSQL_PASSWORD=
+    - MYSQL_DATABASE=votejus
 
-- Configurar as propriedades de ambiente para informar a URL onde estará instalado o Votejus:
-  - API_URL_BROWSER=http://localhost:3000/
+  - Para informar a URL onde estará instalado o Votejus:
+    - API_URL_BROWSER=http://localhost:3000/
+
+  - Opcionalmente, para restringir os emails que não aceitos como administrador:
+    - ADMIN_EMAIL_REGEX=@empresa.com.br$
