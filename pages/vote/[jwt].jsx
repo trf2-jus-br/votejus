@@ -33,6 +33,7 @@ export default function Vote(props) {
     setVoting(true)
     try {
       await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
+      setVoting(false)
       router.refresh()
     } catch (e) { }
     setVoting(false)
@@ -45,8 +46,8 @@ export default function Vote(props) {
     );
   });
 
-  const voteDate = new Date(props.data.voteDatetime).toLocaleDateString();
-  const voteTime = new Date(props.data.voteDatetime).toLocaleTimeString();
+  const voteDate = new Date(props.data.voteDatetime).toLocaleDateString('pt-br');
+  const voteTime = new Date(props.data.voteDatetime).toLocaleTimeString('pt-br');
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>

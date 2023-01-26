@@ -8,7 +8,9 @@ const options = {
     ignoreTLS: true,
     tls: {
         rejectUnauthorized: false
-    }
+    },
+    pool: true,
+    maxConnections: 5
 }
 
 export default {

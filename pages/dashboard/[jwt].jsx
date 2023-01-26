@@ -122,8 +122,8 @@ export default function Dashboard(props) {
   const voterPerc = Math.ceil((voteCount / voterCount) * 100)
 
   const voterRows = data.voters.map((v, idx) => {
-    const voteDate = new Date(v.voteDatetime).toLocaleDateString();
-    const voteTime = new Date(v.voteDatetime).toLocaleTimeString();
+    const voteDate = new Date(v.voteDatetime).toLocaleDateString('pt-br');
+    const voteTime = new Date(v.voteDatetime).toLocaleTimeString('pt-br');
     return (
       <tr key={v.id}>
         <th scope="row">{idx + 1}</th>
@@ -176,10 +176,10 @@ export default function Dashboard(props) {
     );
   });
 
-  const startDate = new Date(data.start).toLocaleDateString();
-  const startTime = new Date(data.start).toLocaleTimeString();
-  const endDate = new Date(data.end).toLocaleDateString();
-  const endTime = new Date(data.end).toLocaleTimeString();
+  const startDate = new Date(data.start).toLocaleDateString('pt-br');
+  const startTime = new Date(data.start).toLocaleTimeString('pt-br');
+  const endDate = new Date(data.end).toLocaleDateString('pt-br');
+  const endTime = new Date(data.end).toLocaleTimeString('pt-br');
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
