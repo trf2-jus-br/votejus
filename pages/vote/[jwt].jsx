@@ -54,27 +54,29 @@ export default function Vote(props) {
       <h1 className='mb-4'>{props.data.electionName}</h1>
 
       {props.data.voteDatetime
-        ? <>
-          <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto secreto foi registrado no dia {voteDate} às {voteTime}.</p>
-        </>
-        : <>
-          <p>Prezado(a) {props.data.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>
+        ? <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto secreto foi registrado no dia {voteDate} às {voteTime}.</p>
+        : !props.data.electionStart
+          ? <p className='alert alert-warning'>Prezado(a) {props.data.voterName}, a eleição {props.data.electionName} ainda não foi iniciada.</p>
+          : props.data.electionEnd
+            ? <p className='alert alert-warning'>Prezado(a) {props.data.voterName}, a eleição {props.data.electionName} já está encerrada.</p>
+            : <>
+              <p>Prezado(a) {props.data.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>
 
-          <div className="mt-4 p-5 bg-light rounded">
-            <div className="row">
-              <div className="col">
-                <h3 className="mb-1">Candidatos</h3>
-                {candidateRows}
+              <div className="mt-4 p-5 bg-light rounded">
+                <div className="row">
+                  <div className="col">
+                    <h3 className="mb-1">Candidatos</h3>
+                    {candidateRows}
+                  </div>
+                </div>
+                {
+                  props.data.electionStart && !props.data.electionEnd &&
+                  <div className="mt-4">
+                    <Button as="button" variant="warning" onClick={handleClickVote} disabled={voting || !candidateId}> Votar </Button>
+                  </div>
+                }
               </div>
-            </div>
-            {
-              props.data.electionStart && !props.data.electionEnd &&
-              <div className="mt-4">
-                <Button as="button" variant="warning" onClick={handleClickVote} disabled={voting || !candidateId}> Votar </Button>
-              </div>
-            }
-          </div>
-        </>
+            </>
       }
     </Layout >
   )

@@ -12,6 +12,8 @@ const handler = async function (req, res) {
     const voterId = req.body.voterId
     const voter = election.voters.find(v => v.id === voterId)
     if (!voter) throw `Eleitor ${voterId} não encontrado`
+    if (!election.start) throw `Eleição ${election.name} ainda não foi iniciada`
+    if (election.end) throw `Eleição ${election.name} já está encerrada`
 
     const voterJwt = await jwt.buildJwt({ kind: "voter", electionId, voterId })
     const voterLink = `${process.env.API_URL_BROWSER}vote/${voterJwt}`

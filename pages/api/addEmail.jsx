@@ -14,16 +14,18 @@ const handler = async function (req, res) {
     const voterId = req.body.voterId
     const voter = election.voters.find(v => v.id === voterId)
     if (!voter) throw `Eleitor ${voterId} não encontrado`
+
+    if (election.end) throw `Eleição ${election.name} já foi finalizada`
+
     await mysql.addEmail(electionId, voterId, voterEmail)
 
-    const voterJwt = await jwt.buildJwt({ kind: "voter", electionId, voterId })
-    const voterLink = `${process.env.API_URL_BROWSER}vote/${voterJwt}`
-
-    if (process.env.LOG_LINKS) console.log(voterLink)
-
-    mailer.sendVoteRequest(voterEmail, electionId, election.name, voter.name, voterLink)
-
-    res.status(200).json({ status: 'OK' });
+    if (election.start) {
+        const voterJwt = await jwt.buildJwt({ kind: "voter", electionId, voterId })
+        const voterLink = `${process.env.API_URL_BROWSER}vote/${voterJwt}`
+        if (process.env.LOG_LINKS) console.log(voterLink)
+        mailer.sendVoteRequest(voterEmail, electionId, election.name, voter.name, voterLink)
+    }
+    res.status(200).json({ status: 'NOK' });
 }
 
 export default apiHandler({
