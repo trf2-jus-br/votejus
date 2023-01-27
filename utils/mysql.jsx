@@ -102,7 +102,7 @@ export default {
             if (!electionStart) throw `Eleição ${electionName} ainda não está recebendo votos`
             if (electionEnd) throw `Eleição ${electionName} já está encerrada`
 
-            const [resultVoter] = await conn.query('SELECT * FROM voter WHERE election_id = ? and voter_id = ?;', [electionId, voterId])
+            const [resultVoter] = await conn.query('SELECT * FROM voter WHERE election_id = ? and voter_id = ? FOR UPDATE;', [electionId, voterId])
             if (resultVoter.length !== 1) throw `Usuário ${voterId} não encontrado`
 
             const voteDatetime = resultVoter[0].voter_vote_datetime
