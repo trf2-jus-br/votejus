@@ -26,6 +26,7 @@ export default function Create(props) {
 
   const [electionName, setElectionName] = useState(undefined)
   const [administratorEmail, setAdministratorEmail] = useState(undefined)
+  const [administratorEmailCreated, setAdministratorEmailCreated] = useState(undefined)
   const [voters, setVoters] = useState(undefined)
   const [candidates, setCandidates] = useState(undefined)
   const [creating, setCreating] = useState(false)
@@ -68,6 +69,7 @@ export default function Create(props) {
         localStorage.setItem('candidates', candidates)
         setCreated(true)
         setCreating(false)
+        setAdministratorEmailCreated(administratorEmail)
         setElectionName(undefined)
         setAdministratorEmail(undefined)
         setVoters(undefined)
@@ -83,7 +85,7 @@ export default function Create(props) {
 
       {created
         ? <>
-          <p className='alert alert-success'>Eleição criada com sucesso. Consulte o email "{administratorEmail}" para obter o link para o painel e iniciar a votação.</p>
+          <p className='alert alert-success'>Eleição criada com sucesso. Consulte o email "{administratorEmailCreated}" para obter o link para o painel e iniciar a votação.</p>
         </>
         : <>
           <p>
