@@ -41,6 +41,17 @@ export default {
         }
     },
 
+    maiusculasEMinusculas(s) {
+        let sb = s.toLowerCase().replace(/(^\w{1})|(\s+\w{1})/g, letra => letra.toUpperCase());
+        sb = sb.replace(" E ", " e ")
+        sb = sb.replace(" Da ", " da ")
+        sb = sb.replace(" Das ", " das ")
+        sb = sb.replace(" De ", " de ")
+        sb = sb.replace(" Do ", " do ")
+        sb = sb.replace(" Dos ", " dos ")
+        return sb
+    },
+
     async loadElection(electionId) {
         const conn = await this.getConnection()
         const result = await conn.query('SELECT * FROM election WHERE election_id = ?;', [electionId])
@@ -53,13 +64,13 @@ export default {
         const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_name;', [electionId])
         const voters = []
         resultVoters[0].forEach(r => {
-            voters.push({ id: r.voter_id, name: r.voter_name, email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
+            voters.push({ id: r.voter_id, name: this.maiusculasEMinusculas(r.voter_name), email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
         })
 
         const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc' : "SUBSTRING(candidate_name, 1, 1) = '[', candidate_name"};`, [electionId])
         const candidates = []
         resultCandidates.forEach(r => {
-            candidates.push({ id: r.candidate_id, name: r.candidate_name, votes: (electionEnd ? r.candidate_votes : null) })
+            candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
         })
 
         conn.release()

@@ -156,10 +156,10 @@ export default function Dashboard(props) {
     return (
       <div key={v.id} className="col">
         {v.voteDatetime
-          ? <p className="alert alert-success p-2 m-0">{v.name}</p>
+          ? <p className="alert alert-success p-2 m-0 h-100">{v.name}</p>
           : data.end
-            ? <p className="alert alert-danger p-2 m-0">{v.name}</p>
-            : <p className="alert alert-secondary p-2 m-0">{v.name}</p>
+            ? <p className="alert alert-danger p-2 m-0 h-100">{v.name}</p>
+            : <p className="alert alert-secondary p-2 m-0 h-100">{v.name}</p>
         }
       </div>
     );
