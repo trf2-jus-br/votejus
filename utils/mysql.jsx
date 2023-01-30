@@ -54,39 +54,57 @@ export default {
 
     async loadElection(electionId) {
         const conn = await this.getConnection()
-        const result = await conn.query('SELECT * FROM election WHERE election_id = ?;', [electionId])
+        conn.beginTransaction()
 
-        const electionName = result[0][0].election_name
-        const administratorEmail = result[0][0].election_administrator_email
-        const electionStart = result[0][0].election_start
-        const electionEnd = result[0][0].election_end
+        try {
+            const result = await conn.query('SELECT * FROM election WHERE election_id = ?;', [electionId])
 
-        const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_name;', [electionId])
-        const voters = []
-        resultVoters[0].forEach(r => {
-            voters.push({ id: r.voter_id, name: this.maiusculasEMinusculas(r.voter_name), email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
-        })
+            const electionName = result[0][0].election_name
+            const administratorEmail = result[0][0].election_administrator_email
+            const electionStart = result[0][0].election_start
+            const electionEnd = result[0][0].election_end
 
-        const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc' : "SUBSTRING(candidate_name, 1, 1) = '[', candidate_name"};`, [electionId])
-        const candidates = []
-        resultCandidates.forEach(r => {
-            candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
-        })
+            const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_name;', [electionId])
+            const voters = []
+            resultVoters[0].forEach(r => {
+                voters.push({ id: r.voter_id, name: this.maiusculasEMinusculas(r.voter_name), email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
+            })
 
-        conn.release()
-        return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates }
+            const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc' : "SUBSTRING(candidate_name, 1, 1) = '[', candidate_name"};`, [electionId])
+            const candidates = []
+            resultCandidates.forEach(r => {
+                candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
+            })
+
+            return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates }
+        } finally {
+            conn.rollback()
+            conn.release()
+        }
     },
 
     async startElection(electionId) {
         const conn = await this.getConnection()
-        const result = await conn.query('UPDATE election SET election_start = now() WHERE election_start is null and election_id = ?;', [electionId])
-        conn.release()
+        conn.beginTransaction()
+
+        try {
+            const result = await conn.query('UPDATE election SET election_start = now() WHERE election_start is null and election_id = ?;', [electionId])
+            conn.commit()
+        } finally {
+            conn.release()
+        }
     },
 
     async endElection(electionId) {
         const conn = await this.getConnection()
-        const result = await conn.query('UPDATE election SET election_end = now() WHERE election_end is null and election_id = ?;', [electionId])
-        conn.release()
+        conn.beginTransaction()
+
+        try {
+            const result = await conn.query('UPDATE election SET election_end = now() WHERE election_end is null and election_id = ?;', [electionId])
+            conn.commit()
+        } finally {
+            conn.release()
+        }
     },
 
     async vote(electionId, voterId, candidateId, voterIp) {
