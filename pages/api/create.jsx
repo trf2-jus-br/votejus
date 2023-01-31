@@ -16,7 +16,9 @@ const handler = async function (req, res) {
         const split = l.split(/[:\t,]/)
         const name = validate.voterName(split[0], context)
         split.shift()
-        const email = split.map(i => validate.voterEmail(i, context)).join(', ')
+        const emails = split.filter(s => !!s.trim())
+        if (emails.length === 0) throw 'Nome e e-mail devem ser informados com separação de dois pontos, virgula ou tab ' + context
+        const email = emails.map(i => validate.voterEmail(i, context)).join(', ')
         votersArray.push({ name, email })
     })
 
