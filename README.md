@@ -12,6 +12,8 @@ Procedimento para implantação:
 
   - Controle de acesso:
     - JWT_SECRET=***SUBSTITUIA_POR_UM_UUID_ALEATÓRIO***
+  
+  - Opcionalmente, restringir a validade dos tokens:
     - JWT_EXPIRATION_TIME=24h
   
   - Acesso ao servidor de email:
@@ -33,3 +35,6 @@ Procedimento para implantação:
 
   - Opcionalmente, restringir os emails que são aceitos como administrador:
     - ADMIN_EMAIL_REGEX=@empresa.com.br$
+
+  - Opcionalmente, reordenar aleatoriamente a lista de candidatos que cada eleitor vê:
+    - SHUFFLE_CANDIDATES=true
