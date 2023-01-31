@@ -6,12 +6,15 @@ export default {
     alg: 'HS256',
 
     async buildJwt(payload) {
-        return await new jose.SignJWT(payload)
+        const jwt = new jose.SignJWT(payload)
             .setProtectedHeader({ alg: this.alg })
             .setIssuedAt()
             .setIssuer(process.env.API_URL_BROWSER)
-            .setExpirationTime(process.env.JWT_EXPIRATION_TIME)
-            .sign(this.secret)
+
+        if (process.env.JWT_EXPIRATION_TIME)
+            jwt.setExpirationTime(process.env.JWT_EXPIRATION_TIME)
+
+        return await jwt.sign(this.secret)
     },
 
     async parseJwt(jwt) {
