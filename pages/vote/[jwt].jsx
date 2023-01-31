@@ -54,7 +54,7 @@ export default function Vote(props) {
       <h1 className='mb-4'>{props.data.electionName}</h1>
 
       {props.data.voteDatetime
-        ? <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto secreto foi registrado no dia {voteDate} às {voteTime}.</p>
+        ? <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
         : !props.data.electionStart
           ? <p className='alert alert-warning'>Prezado(a) {props.data.voterName}, a eleição {props.data.electionName} ainda não foi iniciada.</p>
           : props.data.electionEnd
