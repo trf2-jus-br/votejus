@@ -64,13 +64,13 @@ export default {
             const electionStart = result[0][0].election_start
             const electionEnd = result[0][0].election_end
 
-            const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_name;', [electionId])
+            const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_id;', [electionId])
             const voters = []
             resultVoters[0].forEach(r => {
                 voters.push({ id: r.voter_id, name: this.maiusculasEMinusculas(r.voter_name), email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
             })
 
-            const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc' : "SUBSTRING(candidate_name, 1, 1) = '[', candidate_name"};`, [electionId])
+            const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc, candidate_id' : "candidate_id"};`, [electionId])
             const candidates = []
             resultCandidates.forEach(r => {
                 candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
