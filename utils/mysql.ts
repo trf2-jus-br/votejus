@@ -16,11 +16,37 @@ export default {
         return await pool.getConnection();
     },
 
-    async createElection(electionName, administratorEmail, voters, candidates) {
+    async loginEleitor(matriculaSIGA){
+        const conn = await this.getConnection();
+
+        try{
+            const r = await conn.query("SELECT * FROM voter WHERE voter_email = ? ORDER BY voter_id DESC;", [matriculaSIGA]);
+            return r[0][0];
+        }catch(err){
+            throw err;
+        } finally{
+            conn?.release();
+        }
+    },
+
+    async loginAdmin(matriculaSIGA){
+        const conn = await this.getConnection();
+
+        try{
+            const r = await conn.query("SELECT * FROM election WHERE election_administrator_email = ? ORDER BY election_id DESC;", [matriculaSIGA]);
+            return r[0][0];
+        }catch(err){
+            throw err;
+        } finally{
+            conn?.release();
+        }
+    },
+
+    async createElection(electionName, administratorEmail, voters, candidates, numero_selecoes_permitidas, embaralhar_candidatos) {
         const conn = await this.getConnection()
         conn.beginTransaction()
         try {
-            const result = await conn.query('INSERT INTO election(election_name,election_administrator_email) VALUES (?,?);', [electionName, administratorEmail])
+            const result = await conn.query('INSERT INTO election(election_name,election_administrator_email, numero_selecoes_permitidas, embaralhar_candidatos) VALUES (?,?, ?, ?);', [electionName, administratorEmail, numero_selecoes_permitidas, embaralhar_candidatos])
             const electionId = result[0].insertId
 
             voters.forEach(async voter => {
@@ -63,6 +89,8 @@ export default {
             const administratorEmail = result[0][0].election_administrator_email
             const electionStart = result[0][0].election_start
             const electionEnd = result[0][0].election_end
+            const embaralhar_candidatos = result[0][0].embaralhar_candidatos.readInt8() === 1;
+            const numero_selecoes_permitidas = result[0][0].numero_selecoes_permitidas;
 
             const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_id;', [electionId])
             const voters = []
@@ -76,7 +104,7 @@ export default {
                 candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
             })
 
-            return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates }
+            return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates, embaralhar_candidatos, numero_selecoes_permitidas  }
         } finally {
             conn.rollback()
             conn.release()
@@ -127,7 +155,7 @@ export default {
             if (voteDatetime) throw `Usuário ${voterId} não pode votar duas vezes`
 
             const result2 = await conn.query('UPDATE voter SET voter_vote_datetime = now(), voter_vote_ip = ? WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;', [voterIp, electionId, voterId])
-            const result3 = await conn.query('UPDATE candidate SET candidate_votes = candidate_votes + 1 WHERE election_id = ? and candidate_id = ?;', [electionId, candidateId])
+            const result3 = await conn.query('UPDATE candidate SET candidate_votes = candidate_votes + 1 WHERE election_id = ? and candidate_id in (?);', [electionId, candidateId])
             conn.commit()
         } catch (e) {
             conn.rollback()

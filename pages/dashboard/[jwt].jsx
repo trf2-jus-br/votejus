@@ -10,6 +10,7 @@ import Fetcher from '../../utils/fetcher'
 import Layout from '../../components/layout'
 import ModalOkCancel from '../../components/modalOkCancel'
 import ModalEmail from '../../components/modalEmail'
+import ModalItens from '../../components/modalItens'
 
 export function getServerSideProps({ params }) {
   return {
@@ -40,6 +41,7 @@ export default function Dashboard(props) {
   const [selectedVoterId, setSelectedVoterId] = useState(undefined)
   const [selectedVoterName, setSelectedVoterName] = useState(undefined)
   const [showModalAddEmail, setShowModalAddEmail] = useState(false)
+  const [exibirModalDuplicacao, setExibirModalDuplicacao] = useState(false);
 
   const router = useRouter()
 
@@ -94,6 +96,20 @@ export default function Dashboard(props) {
     setShowModalAddEmail(false)
     setSelectedVoterId(undefined)
     setSelectedVoterName(undefined)
+  }
+
+  function duplicarVotacao(candidatos, numero_selecoes_permitadas){
+    localStorage.setItem('electionName', data.name)
+    localStorage.setItem('administratorEmail', data.administratorEmail)
+    localStorage.setItem('voters', data.voters.map(v => `${v.name}:${v.email}`).join('\n'))
+    localStorage.setItem('candidates', candidatos.join('\n'))
+    localStorage.setItem('embaralharCandidatos', data.embaralhar_candidatos)
+    localStorage.setItem('numeroSelecoesPermitidas', numero_selecoes_permitadas)
+
+
+    const url = `${props.API_URL_BROWSER}create`
+    window.open(url, '_blank').focus();
+    setExibirModalDuplicacao(false)
   }
 
   const handleAddEmail = async (voterEmail) => {
@@ -187,8 +203,13 @@ export default function Dashboard(props) {
       <h1 className='mb-4'>{data.name}</h1>
 
       <div>
-        {data.start && <p className="mb-1">Início: {startDate} às {startTime}</p>}
-        <p className="mb-1">Votos recebidos: {voteCount}/{voterCount}</p>
+        <div className='d-flex align-items-start justify-content-between'>
+          <div>
+            {data.start && <p className="mb-1">Início: {startDate} às {startTime}</p>}
+            <p className="mb-1">Votos recebidos: {voteCount}/{voterCount}</p>
+          </div>
+          {data.end && <Button as="a" variant="success" onClick={() => setExibirModalDuplicacao(true)}>Duplicar Votação </Button>}
+        </div>
         <div className="progress d-print-none" role="progressbar" aria-label="Votos recebidos" aria-valuenow={voterPerc} aria-valuemin="0" aria-valuemax="100">
           <div className="progress-bar bg-info" style={{ width: voterPerc + "%" }}></div>
         </div>
@@ -258,7 +279,7 @@ export default function Dashboard(props) {
       <ModalOkCancel show={showModalElectionEnd} onOk={handleElectionEnd} onCancel={closeModalElectionEnd} title="Finalizar Votação" text={`Atenção, esta operação não poderá ser revertida. Tem certeza que deseja finalizar a votação?`} />
       <ModalOkCancel show={showModalResendEmail} onOk={handleResendEmail} onCancel={closeModalResendEmail} title="Reenvio de Email" text={`Deseja reenviar o email para ${selectedVoterName}?`} />
       <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
-
+      <ModalItens show={exibirModalDuplicacao} numeroSelecoesPermitidas={data.numero_selecoes_permitidas} itens={data.candidates.map(c => c.name)} onOk={duplicarVotacao} onCancel={()=> setExibirModalDuplicacao(false)} title="Candidatos" />
     </Layout>
   )
 }

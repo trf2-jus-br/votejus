@@ -1,14 +1,15 @@
-import Head from 'next/head'
 import Button from 'react-bootstrap/Button'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Form from 'react-bootstrap/Form'
 import { useRouter } from 'next/navigation'
 import Fetcher from '../../utils/fetcher'
 import Layout from '../../components/layout'
+import axios from 'axios'
 
 export async function getServerSideProps({ params }) {
   const res = await fetch(`${process.env.API_URL_BROWSER}/api/ballotbox?voterJwt=${params.jwt}`);
   const data = await res.json();
+
   return {
     props: {
       jwt: params.jwt,
@@ -20,47 +21,91 @@ export async function getServerSideProps({ params }) {
 
 export default function Vote(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
-  const [candidateId, setCandidateId] = useState(undefined)
+  const [candidateId, setCandidateId] = useState({})
   const [voting, setVoting] = useState(false)
+  const [dados, setDados] = useState(props.data);
+  const intervalRef = useRef(null);
 
   const router = useRouter()
 
+  async function buscarVotacaoDuplicada(){
+    try{
+      const {data} = await axios.get('/api/login');
+
+      if(data){
+        window.location.href = data;
+      }
+    }catch(err){}
+  }
+
+  async function atualizarDados(){
+    const {data} = await axios.get(`/api/ballotbox?voterJwt=${props.jwt}`);
+    setDados(data);
+  }
+
+  useEffect(() =>{
+    intervalRef.current = setInterval(  ()=> {
+        if(!dados.electionStart){
+          atualizarDados();
+        }else if(dados.voteDatetime){
+          buscarVotacaoDuplicada();
+        }
+    }, 1000)
+
+    return ()=> clearInterval(intervalRef.current);
+  }, [dados])
+
+
   const handleClickCandidate = (id) => {
-    setCandidateId(id)
+    const numero_selecoes = Object.keys(candidateId).filter(k => candidateId[k]).length;
+
+    console.log(numero_selecoes);
+
+    setCandidateId( c => {
+      if(!c[id] && numero_selecoes >= dados.numero_selecoes_permitidas){
+        alert(`Seleções permitidas: ${dados.numero_selecoes_permitidas}`)
+        return c;
+      }
+
+      c[id] = !c[id];
+
+      return {...c};
+    })
   };
 
   const handleClickVote = async () => {
     setVoting(true)
     try {
-      await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId }, { setErrorMessage })
+      const selecao = Object.keys(candidateId).filter(k => candidateId[k]).map(n => parseInt(n));
+      await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId: selecao }, { setErrorMessage })
       setVoting(false)
       router.refresh()
     } catch (e) { }
     setVoting(false)
   };
 
-  const candidateRows = props.data.candidates.map((c, idx) => {
+  const candidateRows = dados.candidates.map((c, idx) => {
     return (
-      <Form.Check key={c.id} type="radio" id={c.id} label={c.name} name="condidateId" value={candidateId === c.id}
-        onChange={() => handleClickCandidate(c.id)} />
+      <Form.Check key={c.id} type="radio" id={c.id} label={c.name} /*name="condidateId"*/ checked={candidateId[c.id] || false}
+        onClick={() => handleClickCandidate(c.id)} />
     );
   });
 
-  const voteDate = new Date(props.data.voteDatetime).toLocaleDateString('pt-br');
-  const voteTime = new Date(props.data.voteDatetime).toLocaleTimeString('pt-br');
+  const voteDate = new Date(dados.voteDatetime).toLocaleDateString('pt-br');
+  const voteTime = new Date(dados.voteDatetime).toLocaleTimeString('pt-br');
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
-      <h1 className='mb-4'>{props.data.electionName}</h1>
+      <h1 className='mb-4'>{dados.electionName}</h1>
 
-      {props.data.voteDatetime
-        ? <p className='alert alert-success'>Prezado(a) {props.data.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
-        : !props.data.electionStart
-          ? <p className='alert alert-warning'>Prezado(a) {props.data.voterName}, a eleição {props.data.electionName} ainda não foi iniciada.</p>
-          : props.data.electionEnd
-            ? <p className='alert alert-warning'>Prezado(a) {props.data.voterName}, a eleição {props.data.electionName} já está encerrada.</p>
+      {dados.voteDatetime
+        ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
+        : !dados.electionStart
+          ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a eleição {dados.electionName} ainda não foi iniciada.</p>
+          : dados.electionEnd
+            ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a eleição {dados.electionName} já está encerrada.</p>
             : <>
-              <p>Prezado(a) {props.data.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>
+              <p>Prezado(a) {dados.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>
 
               <div className="mt-4 p-5 bg-light rounded">
                 <div className="row">
@@ -70,7 +115,7 @@ export default function Vote(props) {
                   </div>
                 </div>
                 {
-                  props.data.electionStart && !props.data.electionEnd &&
+                  dados.electionStart && !dados.electionEnd &&
                   <div className="mt-4">
                     <Button as="button" variant="warning" onClick={handleClickVote} disabled={voting || !candidateId}> Votar </Button>
                   </div>

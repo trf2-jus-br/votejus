@@ -21,7 +21,7 @@ export default function Create(props) {
 
   const exampleElectionName = 'Eleição de Teste'
   const exampleAdministratorEmail = 'administrador@empresa.com.br'
-  const exampleVoters = `Fulano: fulano@empresa.com.br\nBeltrano: beltrano@empresa.com.br`
+  const exampleVoters = `Fulano: T20000\nBeltrano: beltrano@empresa.com.br`
   const exampleCandidates = `Sicrano\nBeltrano\n[Branco]\n[Nulo]`
 
   const [electionName, setElectionName] = useState(undefined)
@@ -29,8 +29,9 @@ export default function Create(props) {
   const [administratorEmailCreated, setAdministratorEmailCreated] = useState(undefined)
   const [voters, setVoters] = useState(undefined)
   const [candidates, setCandidates] = useState(undefined)
-  const [creating, setCreating] = useState(false)
   const [created, setCreated] = useState(false)
+  const [embaralharCandidatos, setEmbaralharCandidatos] = useState(false);
+  const [numeroSelecoesPermitidas, setNumeroSelecoesPermitidas] = useState(1);
 
   // Load fields from localStorage
   React.useEffect(() => {
@@ -50,6 +51,9 @@ export default function Create(props) {
     if (defaultVoters && !voters) setVoters(defaultVoters)
     const defaultCandidates = localStorage.getItem('candidates')
     if (defaultCandidates && !candidates) setCandidates(defaultCandidates)
+
+    setEmbaralharCandidatos(localStorage.getItem('embaralharCandidatos') === 'true');
+    setNumeroSelecoesPermitidas(parseInt(localStorage.getItem('numeroSelecoesPermitidas')) || 1);
   }, [])
 
   const handleChangeElectionName = (evt) => { setElectionName(evt.target.value) };
@@ -60,21 +64,25 @@ export default function Create(props) {
   const handleClickCreate = async () => {
     setValidated(true)
     if (form.current.checkValidity()) {
-      setCreating(true)
       try {
-        await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates }, { setErrorMessage })
+        const votacao = await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates, numeroSelecoesPermitidas, embaralharCandidatos }, { setErrorMessage })
         localStorage.setItem('electionName', electionName)
         localStorage.setItem('administratorEmail', administratorEmail)
         localStorage.setItem('voters', voters)
         localStorage.setItem('candidates', candidates)
+        localStorage.setItem('embaralharCandidatos', embaralharCandidatos)
+        localStorage.setItem('numeroSelecoesPermitidas', numeroSelecoesPermitidas)
+
         setCreated(true)
-        setCreating(false)
         setAdministratorEmailCreated(administratorEmail)
         setElectionName(undefined)
         setAdministratorEmail(undefined)
         setVoters(undefined)
         setCandidates(undefined)
         setValidated(false)
+
+        if( confirm("Deseja visualizar a votação criada") )
+          window.location.href = votacao.url;
       } catch (e) { }
     }
   }
@@ -114,10 +122,10 @@ export default function Create(props) {
             <div className="row">
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
-                  <Form.Label>Nome e E-mail dos Eleitores</Form.Label>
+                  <Form.Label>Nome e Identificador (matrícula ou e-mail) dos Eleitores</Form.Label>
                   <Form.Control as="textarea" rows="10" value={voters} onChange={handleChangeVoters} placeholder={exampleVoters} required />
                   <Form.Text className="text-muted">
-                    Em cada linha informe o nome do eleitor e seus e-mails. Separe os campos com dois pontos, vírgula ou tab. É possível colar neste campo uma tabela copiada do Excel.
+                    Em cada linha informe o nome do eleitor e seus identificadores. Separe os campos com dois pontos, vírgula ou tab. É possível colar neste campo uma tabela copiada do Excel.
                   </Form.Text>
                   <Form.Control.Feedback type="invalid">Lista de eleitores deve ser preenchida.</Form.Control.Feedback>
                 </Form.Group>
@@ -132,6 +140,13 @@ export default function Create(props) {
                   <Form.Control.Feedback type="invalid">Lista de candidatos deve ser preenchida.</Form.Control.Feedback>
                 </Form.Group>
               </div>
+              <label className="mb-3 col col-12 col-lg-6" onClick={() => setEmbaralharCandidatos(s => !s)}>
+                <Form.Check type="radio" label="Embaralhar Candidatos" checked={embaralharCandidatos} />
+              </label>
+              <Form.Group className="mb-3 col col-12 col-lg-6" controlId="voters">
+                  <Form.Label>Número de seleções permitidas</Form.Label>
+                  <Form.Control type="number" min={1} value={numeroSelecoesPermitidas} onChange={({target}) => setNumeroSelecoesPermitidas(parseInt(target.value))} required />
+              </Form.Group>
             </div>
 
             <Button variant="primary" disabled={!electionName || !administratorEmail || !voters || !candidates} onClick={handleClickCreate}>

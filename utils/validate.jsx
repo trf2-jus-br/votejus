@@ -33,6 +33,15 @@ export default {
         }
         return email
     },
+    ehMatriculaSIGA(s){
+        const u = s?.toUpperCase();
+        return u?.startsWith("T2") || u?.startsWith("RJ") || u?.startsWith("ES");
+    },
+    matriculaSIGA(s, context) {
+        if (!s) 
+            throw `Matrícula não informada ${context || ''}`;
+        return s
+    },
 
     email(s, context, name) {
         if (!s) throw `E-mail de ${name} não informado` + (context ? ' ' + context : '')

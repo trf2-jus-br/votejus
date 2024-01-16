@@ -31,9 +31,20 @@ const handler = async function (req, res) {
     const voter = election.voters.find(v => v.id === voterId)
     if (!voter) throw `Eleitor ${voterId} não encontrado`
 
-    const result = { electionId: election.id, electionName: election.name, electionStart: election.start, electionEnd: election.end, voterId: voter.id, voterName: voter.name, voteDatetime: voter.voteDatetime, voteIp: voter.voteIp, candidates: [] }
+    const result = { 
+        electionId: election.id, 
+        electionName: election.name, 
+        electionStart: election.start, 
+        electionEnd: election.end, 
+        voterId: voter.id,
+        voterName: voter.name, 
+        voteDatetime: voter.voteDatetime, 
+        voteIp: voter.voteIp, 
+        candidates: [], 
+        numero_selecoes_permitidas: election.numero_selecoes_permitidas
+    }
 
-    if (process.env.SHUFFLE_CANDIDATES && process.env.SHUFFLE_CANDIDATES !== 'false') {
+    if (election.embaralhar_candidatos) {
         election.candidates.forEach(c => { if (c.name.charAt(0) !== '[') result.candidates.push({ id: c.id, name: c.name }) })
         shuffle(result.candidates)
         election.candidates.forEach(c => { if (c.name.charAt(0) === '[') result.candidates.push({ id: c.id, name: c.name }) })
