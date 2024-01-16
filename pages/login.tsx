@@ -1,3 +1,5 @@
+import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
@@ -28,7 +30,8 @@ function Login(props){
         <div className="container content">
           <div className="px-4 py-5 my-5 text-center">
             <div className="col-lg-6 mx-auto">
-                <img className='w-100' src="/saia.png" />
+                <h4 className="text-success font-weight-bold" style={{ fontSize: "400%" }}><FontAwesomeIcon icon={faCheckToSlot} /></h4>
+                <h4 className="display-5 fw-bold">Votejus</h4>
 
                 <form onSubmit={(event) => logar(event)}>
                     <Form.Control placeholder='Matricula SIGA' className='mt-5 w-100 text-center' type='input' value={matricula} onChange={e => setMatricula(e.target.value)}></Form.Control>
