@@ -30,7 +30,7 @@ export default function Vote(props) {
 
   async function buscarVotacaoDuplicada(){
     try{
-      const {data} = await axios.get('/api/login');
+      const {data} = await axios.get(`/api/login?voterJwt=${props.jwt}`);
 
       if(data){
         window.location.href = data;
@@ -43,11 +43,15 @@ export default function Vote(props) {
     setDados(data);
   }
 
+  useEffect(()=>{
+    setDados(props.data);
+  }, [props.data]);
+
   useEffect(() =>{
     intervalRef.current = setInterval(  ()=> {
         if(!dados.electionStart){
           atualizarDados();
-        }else if(dados.voteDatetime){
+        }else if(dados.voteDatetime || dados.electionEnd){
           buscarVotacaoDuplicada();
         }
     }, 1000)
@@ -58,8 +62,6 @@ export default function Vote(props) {
 
   const handleClickCandidate = (id) => {
     const numero_selecoes = Object.keys(candidateId).filter(k => candidateId[k]).length;
-
-    console.log(numero_selecoes);
 
     setCandidateId( c => {
       if(!c[id] && numero_selecoes >= dados.numero_selecoes_permitidas){

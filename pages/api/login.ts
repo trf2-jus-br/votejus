@@ -51,12 +51,11 @@ async function logar(req: NextApiRequest, res : NextApiResponse){
             kind: "voter", 
             electionId: eleitor.election_id, 
             voterId: eleitor.voter_id,
-            sigla: data.usuario.titularSigla
+            voter_email: data.usuario.titularSigla
         })
         
         // Define a url que o cliente deve acessar.
         const url = `${process.env.API_URL_BROWSER}vote/${voterJwt}`
-        res.setHeader('Set-Cookie', `jwt=${voterJwt}; Secure; HttpOnly; Path=/`)
         return res.send(url);
     }
     
@@ -65,11 +64,11 @@ async function logar(req: NextApiRequest, res : NextApiResponse){
 }
 
 async function atualizarLogin(req: NextApiRequest, res: NextApiResponse){
-    // Pega do cookie o usuário que está logado.
-    const payload = await jwt.parseJwt(req.cookies['jwt'])
+    // Pega o jwt do usuário que está logado.
+    const payload = await jwt.parseJwt(req.query.voterJwt)
 
     // Busca a última votação que o usuário foi cadastrado.
-    const eleitor = await mysql.loginEleitor(payload.sigla);
+    const eleitor = await mysql.loginEleitor(payload.voter_email);
 
     if(eleitor && eleitor.election_id > payload.electionId){
         // Cria uma JWT compatível com a JWT que seria enviada por e-mail.
@@ -77,6 +76,7 @@ async function atualizarLogin(req: NextApiRequest, res: NextApiResponse){
             kind: "voter", 
             electionId: eleitor.election_id, 
             voterId: eleitor.voter_id,
+            voter_email: eleitor.voter_email
         })
 
         // Define a url que o cliente deve acessar.
