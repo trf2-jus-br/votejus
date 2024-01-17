@@ -40,7 +40,8 @@ export default function Vote(props) {
 
   async function atualizarDados(){
     const {data} = await axios.get(`/api/ballotbox?voterJwt=${props.jwt}`);
-    setDados(data);
+    if(data.electionStart)
+      setDados(data);
   }
 
   useEffect(()=>{
@@ -82,7 +83,9 @@ export default function Vote(props) {
       await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId: selecao }, { setErrorMessage })
       setVoting(false)
       window.location.reload();
-    } catch (e) { }
+    } catch (e) { 
+      console.log("erro", e)      
+    }
     setVoting(false)
   };
 
@@ -95,6 +98,12 @@ export default function Vote(props) {
 
   const voteDate = new Date(dados.voteDatetime).toLocaleDateString('pt-br');
   const voteTime = new Date(dados.voteDatetime).toLocaleTimeString('pt-br');
+
+  console.log("dados:")
+  console.log(JSON.stringify(dados, null, 3))
+
+  console.log("data:")
+  console.log(JSON.stringify(props.data, null, 3))
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
