@@ -81,12 +81,13 @@ export default function Vote(props) {
     try {
       const selecao = Object.keys(candidateId).filter(k => candidateId[k]).map(n => parseInt(n));
       await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId: selecao }, { setErrorMessage })
-      setVoting(false)
-      window.location.reload();
+
+      setTimeout(window.location.reload, 1000)
+      //setVoting(false)
     } catch (e) { 
+      setVoting(false)
       console.log("erro", e)      
     }
-    setVoting(false)
   };
 
   const candidateRows = dados.candidates.map((c, idx) => {
@@ -98,12 +99,6 @@ export default function Vote(props) {
 
   const voteDate = new Date(dados.voteDatetime).toLocaleDateString('pt-br');
   const voteTime = new Date(dados.voteDatetime).toLocaleTimeString('pt-br');
-
-  console.log("dados:")
-  console.log(JSON.stringify(dados, null, 3))
-
-  console.log("data:")
-  console.log(JSON.stringify(props.data, null, 3))
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
