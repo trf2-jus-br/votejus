@@ -111,7 +111,7 @@ export default function Vote(props) {
           : dados.electionEnd
             ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a eleição {dados.electionName} já está encerrada.</p>
             : <>
-              <p>Prezado(a) {dados.voterName}, selecione o candidato na lista abaixo e clique em "votar" para registrar seu voto.</p>
+              <p>Prezado(a) {dados.voterName}, selecione o(s) candidato(s) na lista abaixo e clique em "votar" para registrar seu voto.</p>
 
               <div className="mt-4 p-5 bg-light rounded">
                 <div className="row">
