@@ -61,9 +61,9 @@ export default function Vote(props) {
   }, [dados])
 
 
-  const handleClickCandidate = (id) => {
-    const numero_selecoes = Object.keys(candidateId).filter(k => candidateId[k]).length;
+  const numero_selecoes = Object.keys(candidateId).filter(k => candidateId[k]).length;
 
+  const handleClickCandidate = (id) => {
     setCandidateId( c => {
       if(!c[id] && numero_selecoes >= dados.numero_selecoes_permitidas){
         alert(`Seleções permitidas: ${dados.numero_selecoes_permitidas}`)
@@ -123,7 +123,7 @@ export default function Vote(props) {
                 {
                   dados.electionStart && !dados.electionEnd &&
                   <div className="mt-4">
-                    <Button as="button" variant="warning" onClick={handleClickVote} disabled={voting || !candidateId}> Votar </Button>
+                    <Button as="button" variant="warning" onClick={handleClickVote} disabled={voting || numero_selecoes === 0}> Votar </Button>
                   </div>
                 }
               </div>
