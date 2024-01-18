@@ -82,7 +82,7 @@ export default function Vote(props) {
       const selecao = Object.keys(candidateId).filter(k => candidateId[k]).map(n => parseInt(n));
       await Fetcher.post(`${props.API_URL_BROWSER}api/vote`, { voterJwt: props.jwt, candidateId: selecao }, { setErrorMessage })
 
-      setTimeout(window.location.reload, 1000)
+      setTimeout(router.refresh, 1000)
       //setVoting(false)
     } catch (e) { 
       setVoting(false)
