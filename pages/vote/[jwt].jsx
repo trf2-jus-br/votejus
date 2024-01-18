@@ -65,13 +65,23 @@ export default function Vote(props) {
 
   const handleClickCandidate = (id) => {
     setCandidateId( c => {
+      // verifica se a seleção está dentro dos limites permitidos.
       if(!c[id] && numero_selecoes >= dados.numero_selecoes_permitidas){
+
+        // em caso de seleção única, deseleciona as outras opções
+        if(dados.numero_selecoes_permitidas === 1){
+          c = {}
+          c[id] = true;
+          return c;
+        }
+
+        // em caso de multiplaescolha, notifica o excesso.
         alert(`Seleções permitidas: ${dados.numero_selecoes_permitidas}`)
         return c;
       }
 
+      // caso esteja dentro dos limites, aplica a alteração.
       c[id] = !c[id];
-
       return {...c};
     })
   };
