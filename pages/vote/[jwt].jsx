@@ -118,10 +118,10 @@ export default function Vote(props) {
 
   function labelCandidato(c){
     if(c.name.toLowerCase() === "[branco]")
-      return "Branco";
+      return "Voto em branco";
 
     if(c.name.toLowerCase() === "[nulo]")
-      return "Nulo";
+      return "Voto nulo";
 
     return c.name;
   }
