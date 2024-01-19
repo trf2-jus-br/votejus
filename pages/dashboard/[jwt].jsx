@@ -200,7 +200,7 @@ export default function Dashboard(props) {
     return (
       <tr key={c.id}>
         <th scope="row"></th>
-        <td className='text-end' >{c.name.toLowerCase() === "[branco]" ? "Votos Brancos" : "Votos Nulos"}</td>
+        <td>{c.name.toLowerCase() === "[branco]" ? "Votos Brancos" : "Votos Nulos"}</td>
         <td style={{ textAlign: "right" }}>{c.votes}</td>
       </tr>
     );

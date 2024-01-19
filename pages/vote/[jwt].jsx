@@ -134,7 +134,7 @@ export default function Vote(props) {
   });
   const BrancosENulos = dados.candidates.filter(c => eh_branco_ou_nulo(c.id)).map((c, idx) => {
     return (
-      <Form.Check style={{marginRight: 30}} key={c.id} type="radio" id={c.id} label={labelCandidato(c)} checked={candidateId[c.id] || false} onClick={() => handleClickCandidate(c.id)} />
+      <Form.Check key={c.id} type="radio" id={c.id} label={labelCandidato(c)} checked={candidateId[c.id] || false} onClick={() => handleClickCandidate(c.id)} />
     );
   });
 
@@ -160,7 +160,7 @@ export default function Vote(props) {
                     <h3 className="mb-1">Candidatos</h3>
                     {candidateRows}
 
-                    {BrancosENulos.length > 0 && (<div className='d-flex mt-5'>{BrancosENulos}</div>)}
+                    {BrancosENulos}
                   </div>
                 </div>
                 {
