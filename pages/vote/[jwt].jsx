@@ -63,8 +63,24 @@ export default function Vote(props) {
 
   const numero_selecoes = Object.keys(candidateId).filter(k => candidateId[k]).length;
 
+  function eh_branco_ou_nulo(id){
+    const nome = dados.candidates.find(c => c.id == id).name.toLowerCase();
+    return nome === "[branco]" || nome === "[nulo]";
+  }
+
   const handleClickCandidate = (id) => {
     setCandidateId( c => {
+      // ao selecionar [Branco] ou [Nulo], deseleciona os demais.
+      // ao selecionar algo, deseleciona o [Branco] ou [Nulo]
+      const selecao = Object.keys(candidateId).filter(k => candidateId[k]).map(n => parseInt(n));
+      const branco_selecionado = selecao.length === 1 && eh_branco_ou_nulo(selecao[0]);
+
+      if(!c[id] && (eh_branco_ou_nulo(id) || branco_selecionado)){
+          c = {}
+          c[id] = true;
+          return c;
+      }
+
       // verifica se a seleção está dentro dos limites permitidos.
       if(!c[id] && numero_selecoes >= dados.numero_selecoes_permitidas){
 
@@ -100,10 +116,25 @@ export default function Vote(props) {
     }
   };
 
-  const candidateRows = dados.candidates.map((c, idx) => {
+  function labelCandidato(c){
+    if(c.name.toLowerCase() === "[branco]")
+      return "Branco";
+
+    if(c.name.toLowerCase() === "[nulo]")
+      return "Nulo";
+
+    return c.name;
+  }
+
+  const candidateRows = dados.candidates.filter(c => !eh_branco_ou_nulo(c.id)).map((c, idx) => {
     return (
-      <Form.Check key={c.id} type="radio" id={c.id} label={c.name} /*name="condidateId"*/ checked={candidateId[c.id] || false}
+      <Form.Check key={c.id} type="radio" id={c.id} label={c.name} checked={candidateId[c.id] || false}
         onClick={() => handleClickCandidate(c.id)} />
+    );
+  });
+  const BrancosENulos = dados.candidates.filter(c => eh_branco_ou_nulo(c.id)).map((c, idx) => {
+    return (
+      <Form.Check style={{marginRight: 30}} key={c.id} type="radio" id={c.id} label={labelCandidato(c)} checked={candidateId[c.id] || false} onClick={() => handleClickCandidate(c.id)} />
     );
   });
 
@@ -128,6 +159,8 @@ export default function Vote(props) {
                   <div className="col">
                     <h3 className="mb-1">Candidatos</h3>
                     {candidateRows}
+
+                    {BrancosENulos.length > 0 && (<div className='d-flex mt-5'>{BrancosENulos}</div>)}
                   </div>
                 </div>
                 {

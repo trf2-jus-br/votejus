@@ -181,12 +181,26 @@ export default function Dashboard(props) {
     );
   });
 
-
-  const candidateRows = data.candidates.map((c, idx) => {
+  function eh_branco_ou_nulo(id){
+    const nome = dados.candidates.find(c => c.id == id).name.toLowerCase();
+    return nome === "[branco]" || nome === "[nulo]";
+  }
+  
+  const candidateRows = data.candidates.filter(c => c.name.toLowerCase() !== "[branco]" && c.name.toLowerCase() !== "[nulo]").map((c, idx) => {
     return (
       <tr key={c.id}>
         <th scope="row">{idx + 1}</th>
         <td>{c.name}</td>
+        <td style={{ textAlign: "right" }}>{c.votes}</td>
+      </tr>
+    );
+  });
+
+  const BrancoeNulos = data.candidates.filter(c => c.name.toLowerCase() === "[branco]" || c.name.toLowerCase() === "[nulo]").map((c, idx) => {
+    return (
+      <tr key={c.id}>
+        <th scope="row"></th>
+        <td className='text-end' >{c.name.toLowerCase() === "[branco]" ? "Votos Brancos" : "Votos Nulos"}</td>
         <td style={{ textAlign: "right" }}>{c.votes}</td>
       </tr>
     );
@@ -260,7 +274,7 @@ export default function Dashboard(props) {
         </div>
       }
 
-      <div className="mt-4">
+<div className="mt-4">
         <h3 className="mb-1">Candidatos</h3>
         <table className="table table-sm table-striped">
           <thead>
@@ -272,6 +286,7 @@ export default function Dashboard(props) {
           </thead>
           <tbody className="table-group-divider">
             {candidateRows}
+            {BrancoeNulos}
           </tbody>
         </table>
       </div>
