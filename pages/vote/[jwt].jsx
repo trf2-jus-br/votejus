@@ -160,7 +160,10 @@ export default function Vote(props) {
                     <h3 className="mb-1">Candidatos</h3>
                     {candidateRows}
 
-                    {BrancosENulos}
+                    {BrancosENulos.length > 0 && <>
+                      <hr className='w-100' />
+                      {BrancosENulos}
+                    </>}
                   </div>
                 </div>
                 {
