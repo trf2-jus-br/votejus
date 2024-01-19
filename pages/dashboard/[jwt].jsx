@@ -186,9 +186,10 @@ export default function Dashboard(props) {
     return nome === "[branco]" || nome === "[nulo]";
   }
   
-  const candidateRows = data.candidates.filter(c => c.name.toLowerCase() !== "[branco]" && c.name.toLowerCase() !== "[nulo]").map((c, idx) => {
+  const candidatosValidos =  data.candidates.filter(c => c.name.toLowerCase() !== "[branco]" && c.name.toLowerCase() !== "[nulo]");
+  const candidateRows = candidatosValidos.map((c, idx) => {
     return (
-      <tr key={c.id}>
+      <tr key={c.id} style={idx === candidatosValidos.length - 1 ? {borderBottom: 'solid 1px #333'} : {}}>
         <th scope="row">{idx + 1}</th>
         <td>{c.name}</td>
         <td style={{ textAlign: "right" }}>{c.votes}</td>
@@ -200,7 +201,7 @@ export default function Dashboard(props) {
     return (
       <tr key={c.id}>
         <th scope="row"></th>
-        <td>{c.name.toLowerCase() === "[branco]" ? "Votos Brancos" : "Votos Nulos"}</td>
+        <td style={{fontWeight: "bold" }}>{c.name.toLowerCase() === "[branco]" ? "Votos Brancos" : "Votos Nulos"}</td>
         <td style={{ textAlign: "right" }}>{c.votes}</td>
       </tr>
     );
