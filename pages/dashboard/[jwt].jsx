@@ -104,6 +104,7 @@ export default function Dashboard(props) {
     localStorage.setItem('voters', data.voters.map(v => `${v.name}:${v.email}`).join('\n'))
     localStorage.setItem('candidates', candidatos.join('\n'))
     localStorage.setItem('embaralharCandidatos', data.embaralhar_candidatos)
+    localStorage.setItem('ocultarEleitores', data.ocultar_eleitores)
     localStorage.setItem('numeroSelecoesPermitidas', numero_selecoes_permitadas)
 
 
@@ -239,7 +240,7 @@ export default function Dashboard(props) {
         </div>
       }
 
-      {data.start && !data.end &&
+      {data.start && !data.end && !data.ocultar_eleitores &&
         <div className="d-print-none">
           <h3 className="mb-1 mt-4">Painel de Acompanhamento</h3>
           <div className="row row-cols-2 row-cols-md-4 row-cols-lg-6 row-cols-xl-8 row-cols-xxl-10 g-2 mt-0">
@@ -248,7 +249,7 @@ export default function Dashboard(props) {
         </div>
       }
 
-      <div className="mt-4">
+      {!data.ocultar_eleitores && <div className="mt-4">
         <h3 className="mb-1">Eleitores</h3>
         <table className="table table-sm table-striped">
           <thead>
@@ -265,7 +266,7 @@ export default function Dashboard(props) {
             {voterRows}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {
         data.start && !data.end &&

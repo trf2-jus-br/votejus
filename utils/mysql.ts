@@ -42,11 +42,11 @@ export default {
         }
     },
 
-    async createElection(electionName, administratorEmail, voters, candidates, numero_selecoes_permitidas, embaralhar_candidatos) {
+    async createElection(electionName, administratorEmail, voters, candidates, numero_selecoes_permitidas, embaralhar_candidatos, ocultar_eleitores) {
         const conn = await this.getConnection()
         conn.beginTransaction()
         try {
-            const result = await conn.query('INSERT INTO election(election_name,election_administrator_email, numero_selecoes_permitidas, embaralhar_candidatos) VALUES (?,?, ?, ?);', [electionName, administratorEmail, numero_selecoes_permitidas, embaralhar_candidatos])
+            const result = await conn.query('INSERT INTO election(election_name,election_administrator_email, numero_selecoes_permitidas, embaralhar_candidatos, ocultar_eleitores) VALUES (?,?, ?, ?, ?);', [electionName, administratorEmail, numero_selecoes_permitidas, embaralhar_candidatos, ocultar_eleitores])
             const electionId = result[0].insertId
 
             voters.forEach(async voter => {
@@ -90,6 +90,7 @@ export default {
             const electionStart = result[0][0].election_start
             const electionEnd = result[0][0].election_end
             const embaralhar_candidatos = result[0][0].embaralhar_candidatos.readInt8() === 1;
+            const ocultar_eleitores = result[0][0].ocultar_eleitores.readInt8() === 1;
             const numero_selecoes_permitidas = result[0][0].numero_selecoes_permitidas;
 
             const resultVoters = await conn.query('SELECT * FROM voter WHERE election_id = ? order by voter_id;', [electionId])
@@ -104,7 +105,7 @@ export default {
                 candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
             })
 
-            return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates, embaralhar_candidatos, numero_selecoes_permitidas  }
+            return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates, embaralhar_candidatos, numero_selecoes_permitidas, ocultar_eleitores  }
         } finally {
             conn.rollback()
             conn.release()

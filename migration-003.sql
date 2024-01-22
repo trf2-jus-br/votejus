@@ -1,0 +1,1 @@
+ALTER TABLE election ADD ocultar_eleitores BIT DEFAULT 0;

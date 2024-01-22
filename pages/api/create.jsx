@@ -7,6 +7,7 @@ import validate from '../../utils/validate'
 const handler = async function (req, res) {
     const administratorEmail = validate.administratorEmail(req.body.administratorEmail);
     const embaralharCandidatos = req.body.embaralharCandidatos === true;
+    const ocultarEleitores = req.body.ocultarEleitores === true;
     const numero_selecoes_permitidas = req.body.numeroSelecoesPermitidas;
     const electionName = validate.electionName(req.body.electionName)
     const voters = req.body.voters
@@ -35,7 +36,7 @@ const handler = async function (req, res) {
 
     if (candidatesArray.length === 0) throw 'Nenhum candidato informado'
 
-    const electionId = await mysql.createElection(electionName, administratorEmail, votersArray, candidatesArray, numero_selecoes_permitidas, embaralharCandidatos)
+    const electionId = await mysql.createElection(electionName, administratorEmail, votersArray, candidatesArray, numero_selecoes_permitidas, embaralharCandidatos, ocultarEleitores)
     const administratorJwt = await jwt.buildJwt({ 
         kind: "administrator", 
         electionId, 

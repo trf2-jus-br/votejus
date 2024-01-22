@@ -31,6 +31,7 @@ export default function Create(props) {
   const [candidates, setCandidates] = useState(undefined)
   const [created, setCreated] = useState(false)
   const [embaralharCandidatos, setEmbaralharCandidatos] = useState(false);
+  const [ocultarEleitores, setOcultarEleitores] = useState(false);
   const [numeroSelecoesPermitidas, setNumeroSelecoesPermitidas] = useState(1);
 
   // Load fields from localStorage
@@ -53,6 +54,7 @@ export default function Create(props) {
     if (defaultCandidates && !candidates) setCandidates(defaultCandidates)
 
     setEmbaralharCandidatos(localStorage.getItem('embaralharCandidatos') === 'true');
+    setOcultarEleitores(localStorage.getItem('ocultarEleitores') === 'true');
     setNumeroSelecoesPermitidas(parseInt(localStorage.getItem('numeroSelecoesPermitidas')) || 1);
   }, [])
 
@@ -65,13 +67,14 @@ export default function Create(props) {
     setValidated(true)
     if (form.current.checkValidity()) {
       try {
-        const votacao = await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates, numeroSelecoesPermitidas, embaralharCandidatos }, { setErrorMessage })
+        const votacao = await Fetcher.post(`${props.API_URL_BROWSER}api/create`, { electionName, administratorEmail, voters, candidates, numeroSelecoesPermitidas, embaralharCandidatos, ocultarEleitores }, { setErrorMessage })
         localStorage.setItem('electionName', electionName)
         localStorage.setItem('administratorEmail', administratorEmail)
         localStorage.setItem('voters', voters)
         localStorage.setItem('candidates', candidates)
         localStorage.setItem('embaralharCandidatos', embaralharCandidatos)
         localStorage.setItem('numeroSelecoesPermitidas', numeroSelecoesPermitidas)
+        localStorage.setItem('ocultarEleitores', ocultarEleitores)
 
         setCreated(true)
         setAdministratorEmailCreated(administratorEmail)
@@ -140,9 +143,14 @@ export default function Create(props) {
                   <Form.Control.Feedback type="invalid">Lista de candidatos deve ser preenchida.</Form.Control.Feedback>
                 </Form.Group>
               </div>
-              <label className="mb-3 col col-12 col-lg-6" onClick={() => setEmbaralharCandidatos(s => !s)}>
-                <Form.Check type="radio" label="Embaralhar Candidatos" checked={embaralharCandidatos} />
-              </label>
+              <div className="mb-3 col col-12 col-lg-6 d-flex flex-column" >
+                <label onClick={() => setEmbaralharCandidatos(s => !s)}>
+                  <Form.Check type="radio" label="Embaralhar Candidatos" checked={embaralharCandidatos} />
+                </label>
+                <label onClick={() => setOcultarEleitores(s => !s)}>
+                  <Form.Check type="radio" label="Ocultar eleitores" checked={ocultarEleitores} />
+                </label>
+              </div>
               <Form.Group className="mb-3 col col-12 col-lg-6" controlId="voters">
                   <Form.Label>Número de seleções permitidas</Form.Label>
                   <Form.Control type="number" min={1} value={numeroSelecoesPermitidas} onChange={({target}) => setNumeroSelecoesPermitidas(parseInt(target.value))} required />
