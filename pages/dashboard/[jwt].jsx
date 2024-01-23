@@ -11,6 +11,7 @@ import Layout from '../../components/layout'
 import ModalOkCancel from '../../components/modalOkCancel'
 import ModalEmail from '../../components/modalEmail'
 import ModalItens from '../../components/modalItens'
+import { Form } from 'react-bootstrap'
 
 export function getServerSideProps({ params }) {
   return {
@@ -42,6 +43,7 @@ export default function Dashboard(props) {
   const [selectedVoterName, setSelectedVoterName] = useState(undefined)
   const [showModalAddEmail, setShowModalAddEmail] = useState(false)
   const [exibirModalDuplicacao, setExibirModalDuplicacao] = useState(false);
+  const [ocultarEleitores, setOcultarEleitores] = useState(undefined);
 
   const router = useRouter()
 
@@ -133,6 +135,9 @@ export default function Dashboard(props) {
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>
 
+  if(ocultarEleitores !== undefined)
+    data.ocultar_eleitores = ocultarEleitores;
+
   let voteCount = 0
   let voterCount = data.voters.length
   data.voters.map(v => { if (v.voteDatetime) voteCount++ })
@@ -181,11 +186,6 @@ export default function Dashboard(props) {
       </div>
     );
   });
-
-  function eh_branco_ou_nulo(id){
-    const nome = dados.candidates.find(c => c.id == id).name.toLowerCase();
-    return nome === "[branco]" || nome === "[nulo]";
-  }
   
   const candidatosValidos =  data.candidates.filter(c => c.name.toLowerCase() !== "[branco]" && c.name.toLowerCase() !== "[nulo]");
   const candidateRows = candidatosValidos.map((c, idx) => {
@@ -216,15 +216,18 @@ export default function Dashboard(props) {
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <h4 className='mb-0 text-end'>VOTEJUS-{data.id}</h4>
-      <h1 className='mb-4'>{data.name}</h1>
+      <div className='d-flex align-items-center justify-content-between'>
+        <h1 className='mb-4'>{data.name}</h1>
+        {data.end && <Button as="a" variant="success" onClick={() => setExibirModalDuplicacao(true)}>Duplicar Votação </Button>}
+      </div>
 
       <div>
-        <div className='d-flex align-items-start justify-content-between'>
+        <div className='d-flex align-items-center justify-content-between'>
           <div>
             {data.start && <p className="mb-1">Início: {startDate} às {startTime}</p>}
             <p className="mb-1">Votos recebidos: {voteCount}/{voterCount}</p>
           </div>
-          {data.end && <Button as="a" variant="success" onClick={() => setExibirModalDuplicacao(true)}>Duplicar Votação </Button>}
+          <Form.Check defaultChecked={data.ocultar_eleitores} onChange={({target}) => setOcultarEleitores(target.checked)} type="switch" label="Ocultar eleitores"/>
         </div>
         <div className="progress d-print-none" role="progressbar" aria-label="Votos recebidos" aria-valuenow={voterPerc} aria-valuemin="0" aria-valuemax="100">
           <div className="progress-bar bg-info" style={{ width: voterPerc + "%" }}></div>
