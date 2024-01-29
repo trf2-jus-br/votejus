@@ -12,6 +12,7 @@ function Login(props){
 
     async function logar(event: FormEvent){
         event.preventDefault();
+        //@ts-ignore
         const sistema : Sistema = event.nativeEvent?.submitter?.getAttribute("name") || "EPROC";
 
         try{
