@@ -38,3 +38,25 @@ interface SIGA_GI_ACESSO {
 interface SIGA_API_V1_LOGIN {
     token : string
 }
+
+interface EPROC_API_V1_LOGIN_ERROR {
+    errormsg : string;
+    errordetails: {
+        context: string;
+        service: string;
+        stacktrace: string;
+        presentable: boolean;
+        logged: boolean;
+        url: string;
+    }[]
+}
+
+interface EPROC_API_V1_LOGIN {
+    nome: string;
+    cpf: string;
+    codusu: string;
+    perfil: "consulta-processo",
+    interno: boolean;
+}
+
+type Sistema =  "EPROC" | "SIGA";
