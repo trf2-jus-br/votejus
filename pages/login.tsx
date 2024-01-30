@@ -66,11 +66,11 @@ function Login(props){
                                 <span>Entrar com</span>
                                 <img style={{width:"30px", margin: "0px 10px"}} src="https://eproc.trf2.jus.br/eproc/css/images/logo_eproc.png?h=19e7233d789662dad12b703d82ac6dc0" alt="" />
                             </Button>
-                            <Button type='submit' name='SIGA' className="mt-2 w-100 d-flex justify-content-center align-items-center">
+                            {/*<Button type='submit' name='SIGA' className="mt-2 w-100 d-flex justify-content-center align-items-center">
                                 <span></span>
                                 <span>Entrar com</span>
                                 <img style={{width:"40px", margin: "7px 10px 0"}} src="https://siga.jfrj.jus.br/siga/imagens/logo-siga-novo-38px.png" alt="" />
-                            </Button>
+                        </Button>*/}
                         </div>
                     </form>
                     </div>
