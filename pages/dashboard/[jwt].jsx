@@ -35,6 +35,14 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
   </a>
 ));
 
+const DICIONARIO_PLURAL = {
+  '[branco]' : "Votos em branco",
+  '[nulo]' : "Votos nulos",
+  '[abstenção]' : "Abstenções",
+  '[abstençao]' : "Abstenções",
+  '[abstencao]' : "Abstenções",
+}
+
 export default function Dashboard(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
   const [showModalResendEmail, setShowModalResendEmail] = useState(false)
@@ -187,7 +195,7 @@ export default function Dashboard(props) {
     );
   });
   
-  const candidatosValidos =  data.candidates.filter(c => c.name.toLowerCase() !== "[branco]" && c.name.toLowerCase() !== "[nulo]");
+  const candidatosValidos =  data.candidates.filter(c => DICIONARIO_PLURAL[c.name.toLowerCase()] == null);
   const candidateRows = candidatosValidos.map((c, idx) => {
     return (
       <tr key={c.id} style={idx === candidatosValidos.length - 1 ? {borderBottom: 'solid 1px #333'} : {}}>
@@ -198,11 +206,11 @@ export default function Dashboard(props) {
     );
   });
 
-  const BrancoeNulos = data.candidates.filter(c => c.name.toLowerCase() === "[branco]" || c.name.toLowerCase() === "[nulo]").map((c, idx) => {
+  const BrancoeNulos = data.candidates.filter(c => DICIONARIO_PLURAL[c.name.toLowerCase()] != null).map((c, idx) => {
     return (
       <tr key={c.id}>
         <th scope="row"></th>
-        <td style={{fontWeight: "bold" }}>{c.name.toLowerCase() === "[branco]" ? "Votos em branco" : "Votos nulos"}</td>
+        <td style={{fontWeight: "bold" }}>{DICIONARIO_PLURAL[c.name.toLowerCase()]}</td>
         <td style={{ textAlign: "right" }}>{c.votes}</td>
       </tr>
     );

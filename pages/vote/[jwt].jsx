@@ -6,6 +6,14 @@ import Fetcher from '../../utils/fetcher'
 import Layout from '../../components/layout'
 import axios from 'axios'
 
+const DICIONARIO_SINGULAR = {
+  '[branco]' : "Voto em branco",
+  '[nulo]' : "Voto nulo",
+  '[abstenção]' : "Abstenção",
+  '[abstençao]' : "Abstenção",
+  '[abstencao]' : "Abstenção",
+}
+
 export async function getServerSideProps({ params }) {
   const res = await fetch(`${process.env.API_URL_BROWSER}/api/ballotbox?voterJwt=${params.jwt}`);
   const data = await res.json();
@@ -65,7 +73,7 @@ export default function Vote(props) {
 
   function eh_branco_ou_nulo(id){
     const nome = dados.candidates.find(c => c.id == id).name.toLowerCase();
-    return nome === "[branco]" || nome === "[nulo]";
+    return DICIONARIO_SINGULAR[nome] != null;
   }
 
   const handleClickCandidate = (id) => {
@@ -117,13 +125,8 @@ export default function Vote(props) {
   };
 
   function labelCandidato(c){
-    if(c.name.toLowerCase() === "[branco]")
-      return "Voto em branco";
-
-    if(c.name.toLowerCase() === "[nulo]")
-      return "Voto nulo";
-
-    return c.name;
+    const especial = DICIONARIO_SINGULAR[c.name.toLowerCase()];
+    return  especial ? especial : c.name;
   }
 
   const candidateRows = dados.candidates.filter(c => !eh_branco_ou_nulo(c.id)).map((c, idx) => {

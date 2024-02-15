@@ -138,7 +138,7 @@ export default function Create(props) {
                   <Form.Label>Candidatos</Form.Label>
                   <Form.Control as="textarea" rows="10" value={candidates} onChange={handleChangeCandidates} placeholder={exampleCandidates} required />
                   <Form.Text className="text-muted">
-                    Em cada linha informe o nome de um candidato. Inclua candidados com os nomes [Branco] e [Nulo], se for o caso.
+                    Em cada linha informe o nome de um candidato. Inclua candidados com os nomes [Branco], [Abstenção] ou [Nulo], se for o caso.
                   </Form.Text>
                   <Form.Control.Feedback type="invalid">Lista de candidatos deve ser preenchida.</Form.Control.Feedback>
                 </Form.Group>
