@@ -15,14 +15,14 @@ function Cedula({voto, indice, candidatos, votos_considerados} : Props){
 
     return <div className="col-12 col-lg-6 col-xl-4 col-xxl-3 p-3">
         <div className={votos_considerados >= indice ? "opacity-100" : ''} style={e.container}>
-            <h5 className="text-center">Voto {indice}</h5> 
+            <h5 className="text-center">Voto</h5> 
             <hr className="w-100 mt-0"/>
             <div style={e.candidatos}>
                 {candidatos_reais?.map((c, idx) => {
                     const ids = voto.split(',').map(s => parseInt(s));
                     const ativo = ids.indexOf(c.id) !== -1;
                       
-                    return <Form.Check key={c.id} type="radio" id={c.id} label={c.id +"# " +c.name} onChange={() => null} checked={ativo} disabled={!ativo}/>
+                    return <Form.Check key={c.id} type="radio" id={c.id} label={c.name} onChange={() => null} checked={ativo} disabled={!ativo}/>
                 })}
                 <hr/>
                 {candidatos_nulos?.map((c, idx) => {
