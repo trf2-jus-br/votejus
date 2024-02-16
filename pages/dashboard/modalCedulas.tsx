@@ -40,6 +40,9 @@ function ModalCedulas({candidatos, votos} : Props, ref){
         }).length;
     }
 
+    if(!candidatos || !votos)
+        return <></>;
+
     const candidatosValidos =  candidatos.filter(c => DICIONARIO_PLURAL[c.name.toLowerCase()] == null);
     const candidateRows = candidatosValidos.map((c, idx) => {
         return (
