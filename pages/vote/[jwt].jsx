@@ -5,14 +5,7 @@ import { useRouter } from 'next/navigation'
 import Fetcher from '../../utils/fetcher'
 import Layout from '../../components/layout'
 import axios from 'axios'
-
-const DICIONARIO_SINGULAR = {
-  '[branco]' : "Voto em branco",
-  '[nulo]' : "Voto nulo",
-  '[abstenção]' : "Abstenção",
-  '[abstençao]' : "Abstenção",
-  '[abstencao]' : "Abstenção",
-}
+import {DICIONARIO_SINGULAR, DICIONARIO_PLURAL} from '../../utils/dicionario';
 
 export async function getServerSideProps({ params }) {
   const res = await fetch(`${process.env.API_URL_BROWSER}/api/ballotbox?voterJwt=${params.jwt}`);

@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleXmark, faCircleCheck, faPaperPlane, faPencil, faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import Dropdown from 'react-bootstrap/Dropdown'
-import React, { useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import useSWR, { SWRConfig } from 'swr'
 import { useRouter } from 'next/navigation'
 import Fetcher from '../../utils/fetcher'
@@ -12,6 +12,9 @@ import ModalOkCancel from '../../components/modalOkCancel'
 import ModalEmail from '../../components/modalEmail'
 import ModalItens from '../../components/modalItens'
 import { Form } from 'react-bootstrap'
+import Cedula from './cedula';
+import {DICIONARIO_SINGULAR, DICIONARIO_PLURAL} from '../../utils/dicionario';
+import ModalCedulas from './modalCedulas'
 
 export function getServerSideProps({ params }) {
   return {
@@ -35,14 +38,6 @@ const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
   </a>
 ));
 
-const DICIONARIO_PLURAL = {
-  '[branco]' : "Votos em branco",
-  '[nulo]' : "Votos nulos",
-  '[abstenção]' : "Abstenções",
-  '[abstençao]' : "Abstenções",
-  '[abstencao]' : "Abstenções",
-}
-
 export default function Dashboard(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
   const [showModalResendEmail, setShowModalResendEmail] = useState(false)
@@ -52,6 +47,8 @@ export default function Dashboard(props) {
   const [showModalAddEmail, setShowModalAddEmail] = useState(false)
   const [exibirModalDuplicacao, setExibirModalDuplicacao] = useState(false);
   const [ocultarEleitores, setOcultarEleitores] = useState(undefined);
+
+  const modalCedulasRef = useRef(null);
 
   const router = useRouter()
 
@@ -140,6 +137,12 @@ export default function Dashboard(props) {
 
   const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher, { refreshInterval: 2000 });
 
+  useEffect(()=>{
+    if(data?.end)
+      modalCedulasRef.current.exibir()
+
+  }, [data])
+
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>
 
@@ -226,7 +229,7 @@ export default function Dashboard(props) {
       <h4 className='mb-0 text-end'>VOTEJUS-{data.id}</h4>
       <div className='d-flex align-items-center justify-content-between'>
         <h1 className='mb-4'>{data.name}</h1>
-        {data.end && <Button as="a" variant="success" onClick={() => setExibirModalDuplicacao(true)}>Duplicar Votação </Button>}
+        {data.end && <Button as="a" variant="success" onClick={() => setExibirModalDuplicacao(true)}>Reiniciar votação</Button>}
       </div>
 
       <div>
@@ -287,8 +290,12 @@ export default function Dashboard(props) {
         </div>
       }
 
-<div className="mt-4">
-        <h3 className="mb-1">Candidatos</h3>
+    <div className="mt-4">
+        <div className='d-flex align-items-center justify-content-between'>
+          <h3 className="mb-1">Candidatos</h3>
+
+          {data.end && <Button onClick={() => modalCedulasRef.current.exibir()}>Detalhar resultado</Button>}
+        </div>
         <table className="table table-sm table-striped">
           <thead>
             <tr>
@@ -308,6 +315,7 @@ export default function Dashboard(props) {
       <ModalOkCancel show={showModalResendEmail} onOk={handleResendEmail} onCancel={closeModalResendEmail} title="Reenvio de Email" text={`Deseja reenviar o email para ${selectedVoterName}?`} />
       <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
       <ModalItens show={exibirModalDuplicacao} numeroSelecoesPermitidas={data.numero_selecoes_permitidas} itens={data.candidates.map(c => c.name)} onOk={duplicarVotacao} onCancel={()=> setExibirModalDuplicacao(false)} title="Candidatos" />
+      <ModalCedulas ref={modalCedulasRef} votos={data.votos} eleitores={data.voters} candidatos={data.candidates} />       
     </Layout>
   )
 }

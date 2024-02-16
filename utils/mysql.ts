@@ -99,13 +99,27 @@ export default {
                 voters.push({ id: r.voter_id, name: this.maiusculasEMinusculas(r.voter_name), email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
             })
 
+            const [resultVotos] = await conn.query('SELECT * FROM voto WHERE eleicao = ?', [electionId]);
+
             const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc, candidate_id' : "candidate_id"};`, [electionId])
             const candidates = []
             resultCandidates.forEach(r => {
                 candidates.push({ id: r.candidate_id, name: this.maiusculasEMinusculas(r.candidate_name), votes: (electionEnd ? r.candidate_votes : null) })
             })
 
-            return { id: electionId, name: electionName, administratorEmail, start: electionStart, end: electionEnd, voters, candidates, embaralhar_candidatos, numero_selecoes_permitidas, ocultar_eleitores  }
+            return { 
+                id: electionId, 
+                name: electionName, 
+                administratorEmail, 
+                start: electionStart, 
+                end: electionEnd, 
+                voters, 
+                candidates, 
+                embaralhar_candidatos, 
+                numero_selecoes_permitidas, 
+                ocultar_eleitores,
+                votos: resultVotos.map(v => v.voto)
+            }
         } finally {
             conn.rollback()
             conn.release()
@@ -155,8 +169,10 @@ export default {
             const voteDatetime = resultVoter[0].voter_vote_datetime
             if (voteDatetime) throw `Usuário ${voterId} não pode votar duas vezes`
 
-            const result2 = await conn.query('UPDATE voter SET voter_vote_datetime = now(), voter_vote_ip = ? WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;', [voterIp, electionId, voterId])
-            const result3 = await conn.query('UPDATE candidate SET candidate_votes = candidate_votes + 1 WHERE election_id = ? and candidate_id in (?);', [electionId, candidateId])
+            await conn.query('UPDATE voter SET voter_vote_datetime = now(), voter_vote_ip = ? WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;', [voterIp, electionId, voterId])
+            await conn.query('UPDATE candidate SET candidate_votes = candidate_votes + 1 WHERE election_id = ? and candidate_id in (?);', [electionId, candidateId])
+            await conn.query('INSERT INTO voto (eleicao, voto) VALUES ( ?, ? );', [electionId, candidateId.map(id => parseInt(id)).join(',')])
+
             conn.commit()
         } catch (e) {
             conn.rollback()
