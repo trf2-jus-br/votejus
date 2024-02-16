@@ -140,9 +140,8 @@ export default function Dashboard(props) {
   const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher, { refreshInterval: 2000 });
 
   useEffect(()=>{
-    if(data?.end)
-      modalCedulasRef.current.exibir()
-
+    //if(data?.end)
+    //  modalCedulasRef.current.exibir()
   }, [data])
 
   if (error) return <div>falhou em carregar</div>

@@ -171,7 +171,7 @@ export default {
 
             await conn.query('UPDATE voter SET voter_vote_datetime = now(), voter_vote_ip = ? WHERE voter_vote_datetime is null and election_id = ? and voter_id = ?;', [voterIp, electionId, voterId])
             await conn.query('UPDATE candidate SET candidate_votes = candidate_votes + 1 WHERE election_id = ? and candidate_id in (?);', [electionId, candidateId])
-            await conn.query('INSERT INTO voto (eleicao, voto) VALUES ( ?, ? );', [electionId, candidateId.map(id => parseInt(id)).join(',')])
+            await conn.query('INSERT INTO voto (id, eleicao, voto) VALUES (CONCAT(RAND(), RAND(), RAND()), ?, ? );', [electionId, candidateId.map(id => parseInt(id)).join(',')])
 
             conn.commit()
         } catch (e) {
