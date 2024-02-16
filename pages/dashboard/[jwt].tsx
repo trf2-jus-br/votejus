@@ -295,7 +295,7 @@ export default function Dashboard(props) {
         <div className='d-flex align-items-center justify-content-between'>
           <h3 className="mb-1">Candidatos</h3>
 
-          {data.end && <Button onClick={() => modalCedulasRef.current.exibir()}>Detalhar resultado</Button>}
+          {data.end && <Button onClick={() => modalCedulasRef.current.exibir(data.candidates, data.votos)}>Detalhar resultado</Button>}
         </div>
         <table className="table table-sm table-striped">
           <thead>

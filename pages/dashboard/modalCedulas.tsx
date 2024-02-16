@@ -9,9 +9,12 @@ interface Props {
     votos: string[],
 }
 
-function ModalCedulas({candidatos, votos} : Props, ref){
+function ModalCedulas(props : Props, ref){
     const [visivel, setVisivel] = useState(false);
     const [votos_considerados, setVotosConsiderados] = useState(0);
+
+    const [candidatos, setCandidatos] = useState(null);
+    const [votos, setVotos] = useState(null);
 
     const intervalRef = useRef(null);
 
@@ -20,7 +23,10 @@ function ModalCedulas({candidatos, votos} : Props, ref){
     }, []);
 
     useImperativeHandle(ref, ()=>({
-        exibir: ()=> {
+        exibir: (candidatos, votos)=> {
+            setCandidatos(candidatos);
+            setVotos(votos);
+
             intervalRef.current = setInterval(()=>{
                 setVotosConsiderados(v => v + 1);
             }, 250)
