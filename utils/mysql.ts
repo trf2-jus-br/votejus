@@ -99,7 +99,7 @@ export default {
                 voters.push({ id: r.voter_id, name: this.maiusculasEMinusculas(r.voter_name), email: r.voter_email, voteDatetime: r.voter_vote_datetime, voteIp: r.voter_vote_ip })
             })
 
-            const [resultVotos] = await conn.query('SELECT * FROM voto WHERE eleicao = ?', [electionId]);
+            const [resultVotos] = await conn.query('SELECT * FROM voto WHERE eleicao = ? ORDER BY RAND();', [electionId]);
 
             const [resultCandidates] = await conn.query(`SELECT * FROM candidate WHERE election_id = ? ORDER BY ${electionEnd ? 'candidate_votes desc, candidate_id' : "candidate_id"};`, [electionId])
             const candidates = []
