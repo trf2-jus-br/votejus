@@ -35,7 +35,7 @@ export default {
     },
     ehMatriculaSIGA(s){
         const u = s?.toUpperCase();
-        return u?.startsWith("T2") || u?.startsWith("RJ") || u?.startsWith("ES");
+        return u?.startsWith("T2") || u?.startsWith("RJ") || u?.startsWith("ES") || u?.startsWith('JRJ');
     },
     matriculaSIGA(s, context) {
         if (!s) 
