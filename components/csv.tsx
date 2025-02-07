@@ -2,7 +2,7 @@ import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Button, Modal, Table } from 'react-bootstrap';
 
 function CSV(props, ref){
-    const promiseRef = useRef({});
+    const promiseRef = useRef<any>({});
     const arquivoRef = useRef(null);
 
     const [linhas, setLinhas] = useState([]);
