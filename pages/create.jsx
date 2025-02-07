@@ -1,10 +1,11 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import React, { useState } from 'react'
 import Fetcher from '../utils/fetcher'
 import Layout from '../components/layout'
+import CSV from '../components/csv';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileCsv } from '@fortawesome/free-solid-svg-icons';
 
 export async function getServerSideProps({ params }) {
   return {
@@ -15,6 +16,7 @@ export async function getServerSideProps({ params }) {
 }
 
 export default function Create(props) {
+  const csv = React.createRef(null);
   const form = React.createRef()
   const [validated, setValidated] = useState(false)
   const [errorMessage, setErrorMessage] = useState(undefined)
@@ -90,6 +92,18 @@ export default function Create(props) {
     }
   }
 
+  const carregarArquivoEleitores = async function(){
+    const linhas = await csv.current.escolherColuna(["Nome", "Matricula / E-mail"]);
+    const eleitores = linhas.map(linha => `${linha[0]}:${linha[1]}`).join('\n');
+    setVoters(eleitores);
+  }
+
+  const carregarArquivoCandidatos = async function(){
+    const linhas = await csv.current.escolherColuna(["Nome"]);
+    const candidatos = linhas.map(linha => `${linha[0]}`).join('\n');
+    setCandidates(candidatos);
+  }
+
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <h1 className='mb-4'>Criação de Votação</h1>
@@ -125,7 +139,10 @@ export default function Create(props) {
             <div className="row">
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
-                  <Form.Label>Nome e Identificador (matrícula ou e-mail) dos Eleitores</Form.Label>
+                  <Form.Label className='d-flex justify-content-between'>
+                    <span>Nome e Identificador (matrícula ou e-mail) dos Eleitores</span>
+                    <FontAwesomeIcon style={{cursor:'pointer'}} icon={faFileCsv} onClick={carregarArquivoEleitores} />
+                  </Form.Label>
                   <Form.Control as="textarea" rows="10" value={voters} onChange={handleChangeVoters} placeholder={exampleVoters} required />
                   <Form.Text className="text-muted">
                     Em cada linha informe o nome do eleitor e seus identificadores. Separe os campos com dois pontos, vírgula ou tab. É possível colar neste campo uma tabela copiada do Excel.
@@ -135,7 +152,10 @@ export default function Create(props) {
               </div>
               <div className="col col-12 col-lg-6">
                 <Form.Group className="mb-3" controlId="voters">
-                  <Form.Label>Candidatos</Form.Label>
+                  <Form.Label className='d-flex justify-content-between'>
+                    <span>Candidatos</span>
+                    <FontAwesomeIcon style={{cursor:'pointer'}} icon={faFileCsv} onClick={carregarArquivoCandidatos} />
+                  </Form.Label>
                   <Form.Control as="textarea" rows="10" value={candidates} onChange={handleChangeCandidates} placeholder={exampleCandidates} required />
                   <Form.Text className="text-muted">
                     Em cada linha informe o nome de um candidato. Inclua candidados com os nomes [Branco], [Abstenção] ou [Nulo], se for o caso.
@@ -163,6 +183,7 @@ export default function Create(props) {
           </Form>
         </>
       }
+      <CSV ref={csv}/>
     </Layout>
   )
 }
