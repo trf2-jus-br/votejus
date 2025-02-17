@@ -17,6 +17,7 @@ import { Form } from 'react-bootstrap'
 import Cedula from './cedula';
 import {DICIONARIO_SINGULAR, DICIONARIO_PLURAL} from '../../utils/dicionario';
 import ModalCedulas from './modalCedulas'
+import ModalEleitor from '../../components/modalEleitor'
 
 export function getServerSideProps({ params }) {
   return {
@@ -51,6 +52,7 @@ export default function Dashboard(props) {
   const [ocultarEleitores, setOcultarEleitores] = useState(undefined);
 
   const modalCedulasRef = useRef(null);
+  const modalInclusaoCandidatoReft = useRef(null);
 
   const router = useRouter()
 
@@ -130,6 +132,23 @@ export default function Dashboard(props) {
     closeModalAddEmail()
   };
 
+  async function incluirEleitor(){
+    try{
+      const {nome, email} = await modalInclusaoCandidatoReft.current.exibir();
+
+      await Fetcher.post(`${props.API_URL_BROWSER}api/addEleitor`, { 
+          administratorJwt: props.jwt,
+          nome, email
+        }, { 
+          setErrorMessage 
+        })
+      
+      router.refresh()
+    }catch(err){
+      setErrorMessage(err);
+    }
+  }
+
   const handleAddVoter = async (voterName, voterEmail) => {
     try {
       await Fetcher.post(`${props.API_URL_BROWSER}api/addVoter`, { administratorJwt: props.jwt, voterName, voterEmail }, { setErrorMessage })
@@ -138,11 +157,6 @@ export default function Dashboard(props) {
   };
 
   const { data, error, isLoading } = useSWR(`/api/dashboard?administratorJwt=${props.jwt}`, Fetcher.fetcher, { refreshInterval: 2000 });
-
-  useEffect(()=>{
-    //if(data?.end)
-    //  modalCedulasRef.current.exibir()
-  }, [data])
 
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>
@@ -265,7 +279,11 @@ export default function Dashboard(props) {
       }
 
       {!data.ocultar_eleitores && <div className="mt-4">
-        <h3 className="mb-1">Eleitores</h3>
+        <h3 className="mb-1 d-flex justify-content-between">
+          <span>Eleitores</span>
+          {!data.end && <Button onClick={incluirEleitor}>Incluir Eleitor</Button>}
+        </h3>
+
         <table className="table table-sm table-striped">
           <thead>
             <tr>
@@ -294,7 +312,6 @@ export default function Dashboard(props) {
     <div className="mt-4">
         <div className='d-flex align-items-center justify-content-between'>
           <h3 className="mb-1">Candidatos</h3>
-
           {data.end && <Button onClick={() => modalCedulasRef.current.exibir(data.candidates, data.votos)}>Detalhar resultado</Button>}
         </div>
         <table className="table table-sm table-striped">
@@ -317,6 +334,7 @@ export default function Dashboard(props) {
       <ModalEmail show={showModalAddEmail} onOk={handleAddEmail} onCancel={closeModalAddEmail} title="Adição de Email" text={`Informe um email adicional para ${selectedVoterName}.`} />
       <ModalItens show={exibirModalDuplicacao} numeroSelecoesPermitidas={data.numero_selecoes_permitidas} itens={data.candidates.map(c => c.name)} onOk={duplicarVotacao} onCancel={()=> setExibirModalDuplicacao(false)} title="Candidatos" />
       <ModalCedulas ref={modalCedulasRef} votos={data.votos} eleitores={data.voters} candidatos={data.candidates} />       
+      <ModalEleitor ref={modalInclusaoCandidatoReft} />
     </Layout>
   )
 }

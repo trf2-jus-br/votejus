@@ -150,6 +150,32 @@ export default {
         }
     },
 
+    async addEleitor(eleicao: number, nome: string, email: string) {
+        const conn = await this.getConnection()
+        try {
+            const r = await conn.query(
+                'INSERT INTO voter (election_id, voter_name, voter_email) VALUES (?, ?, ?);', 
+                [eleicao, nome, email]
+            );
+
+            const idEleitor = r[0].insertId;
+
+            const r2 = await conn.query(
+                'SELECT * FROM election WHERE election_id = ?', 
+                [eleicao]
+            );
+
+            return {
+                eleicao: r2[0][0],
+                idEleitor
+            }
+        } catch(err){
+            throw err;   
+        }finally {
+            conn.release()
+        }
+    },
+
     async vote(electionId, voterId, candidateId, voterIp) {
         const conn = await this.getConnection()
         conn.beginTransaction()
