@@ -137,6 +137,7 @@ function CSV(props, ref){
                     <select defaultValue={tabulacao} className='m-1' onChange={({target}) => setTabulacao(target.value)}>
                         <option value="\t">\t</option>
                         <option value=";">;</option>
+                        <option value=",">,</option>
                     </select>
                     <select defaultValue={quebraLinha} className='m-1' onChange={({target}) => setQuebraLinha(target.value)}>
                         <option value={"\n"}>\n</option>
