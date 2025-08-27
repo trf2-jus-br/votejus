@@ -2,3 +2,7 @@
     width: 90vw!important;
     max-width: 90vw!important;
 }
+
+.modalCedulasModal .modal-content {
+    max-width: none;
+}

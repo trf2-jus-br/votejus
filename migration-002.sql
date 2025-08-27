@@ -1,1 +1,0 @@
-ALTER TABLE election ADD numero_selecoes_permitidas INT, ADD embaralhar_candidatos BIT;

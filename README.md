@@ -8,6 +8,8 @@ Procedimento para implantação:
 
 - Disponibilizar um banco de dados MySQL e executar o script migration-001.sql.
 
+- renomeie o arquivo "EXAMPLE.env" para ".env" e configure de acordo com o seu ambiente.
+
 - Configurar as propriedades de ambiente:
 
   - Controle de acesso:
@@ -34,7 +36,7 @@ Procedimento para implantação:
     - API_URL_BROWSER=http://localhost:8081/
 
   - Opcionalmente, restringir os emails que são aceitos como administrador:
-    - ADMIN_EMAIL_REGEX=@empresa.com.br$
+    - ADMIN_EMAIL_REGEX=@empresa.com.br\\$
 
   - Opcionalmente, reordenar aleatoriamente a lista de candidatos que cada eleitor vê:
     - SHUFFLE_CANDIDATES=true
