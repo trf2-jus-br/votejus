@@ -86,7 +86,7 @@ export default function Create(props) {
         setCandidates(undefined)
         setValidated(false)
 
-        if( confirm("Deseja visualizar a votação criada") )
+        if( confirm("Deseja visualizar a votação criada?") )
           window.location.href = votacao.url;
       } catch (e) { }
     }
