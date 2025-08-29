@@ -6,3 +6,8 @@
 .modalCedulasModal .modal-content {
     max-width: none;
 }
+
+.modalCedulasModal .modal-footer {
+    max-height: 40vh;
+    overflow: scroll;
+}
