@@ -195,7 +195,6 @@ export default function Vote(props) {
       {data?.end && <div className="mt-4">
           <div className='d-flex align-items-center justify-content-between'>
             <h3 className="mb-1">Resultado</h3>
-            <Button onClick={() => modalCedulasRef.current.exibir(data.candidates, data.votos)}>Detalhar votos</Button>
           </div>
           <table className="table table-sm table-striped">
             <thead>

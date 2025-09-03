@@ -73,7 +73,8 @@ function ModalCedulas(props : Props, ref){
     return (
         <Modal dialogClassName='modalCedulasModal' show={visivel} scrollable onHide={() => setVisivel(false)}>
             <Modal.Header closeButton>
-                <Modal.Title>Resultado</Modal.Title>
+                <Modal.Title>Resultado *</Modal.Title>
+
             </Modal.Header>
             <Modal.Body>
                 <div className='modalCedulasContainer' style={e.container}>
@@ -94,6 +95,7 @@ function ModalCedulas(props : Props, ref){
                         {BrancoeNulos}
                     </tbody>
                 </table>
+                * as c&eacute;dulas s&atilde;o embaralhadas a cada exibi&ccedil;&atilde;o.
             </Modal.Footer>
         </Modal>
     );
