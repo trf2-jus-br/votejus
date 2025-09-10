@@ -160,9 +160,9 @@ export default function Vote(props) {
       <h1 className='mb-4'>{dados.electionName}</h1>
 
       {dados.electionEnd
-        ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, esta votação está encerrada.</p>
+        ? <p className='alert alert-success'>Votação encerrada!</p>
         : dados.voteDatetime
-          ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
+          ? <p className='alert alert-success'>Seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
           : !dados.electionStart
             ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a votação ainda não foi iniciada.</p>
             : <>
