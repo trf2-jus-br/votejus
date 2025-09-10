@@ -190,7 +190,7 @@ export default function Vote(props) {
             </>
       }
 
-      {dados?.voteDatetime && <div>O resultado será exibido assim que a votação for concluída. Por favor, aguarde.</div>}
+      {dados?.voteDatetime && !data?.end && <div>O resultado será exibido assim que a votação for concluída. Por favor, aguarde.</div>}
 
       {data?.end && <div className="mt-4">
           <div className='d-flex align-items-center justify-content-between'>
