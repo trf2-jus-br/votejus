@@ -160,11 +160,11 @@ export default function Vote(props) {
       <h1 className='mb-4'>{dados.electionName}</h1>
 
       {dados.electionEnd
-        ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, esta votação {dados.electionName} já está encerrada.</p>
+        ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, esta votação está encerrada.</p>
         : dados.voteDatetime
-          ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
+          ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
           : !dados.electionStart
-            ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a votação {dados.electionName} ainda não foi iniciada.</p>
+            ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a votação ainda não foi iniciada.</p>
             : <>
               <p>Prezado(a) {dados.voterName}, selecione o(s) candidato(s) na lista abaixo e clique em "Votar" para registrar seu voto.</p>
 
