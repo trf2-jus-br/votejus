@@ -77,6 +77,7 @@ function ModalCedulas(props : Props, ref){
 
             </Modal.Header>
             <Modal.Body>
+                * as c&eacute;dulas s&atilde;o embaralhadas a cada exibi&ccedil;&atilde;o.
                 <div className='modalCedulasContainer' style={e.container}>
                     {votos.map((v, i) => <Cedula key={i} voto={v} votos_considerados={votos_considerados} candidatos={candidatos} indice={i + 1} />)} 
                 </div> 
@@ -95,7 +96,6 @@ function ModalCedulas(props : Props, ref){
                         {BrancoeNulos}
                     </tbody>
                 </table>
-                * as c&eacute;dulas s&atilde;o embaralhadas a cada exibi&ccedil;&atilde;o.
             </Modal.Footer>
         </Modal>
     );

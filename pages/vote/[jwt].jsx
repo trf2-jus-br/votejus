@@ -159,14 +159,14 @@ export default function Vote(props) {
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <h1 className='mb-4'>{dados.electionName}</h1>
 
-      {dados.voteDatetime
-        ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
-        : !dados.electionStart
-          ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a eleição {dados.electionName} ainda não foi iniciada.</p>
-          : dados.electionEnd
-            ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a eleição {dados.electionName} já está encerrada.</p>
+      {dados.electionEnd
+        ? <p className='alert alert-success'>Prezado(a) {dados.voterName}, esta votação {dados.electionName} já está encerrada.</p>
+        : !dados.voteDatetime
+          ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, seu voto sigiloso foi registrado no dia {voteDate} às {voteTime}.</p>
+          : dados.electionStart
+            ? <p className='alert alert-warning'>Prezado(a) {dados.voterName}, a votação {dados.electionName} ainda não foi iniciada.</p>
             : <>
-              <p>Prezado(a) {dados.voterName}, selecione o(s) candidato(s) na lista abaixo e clique em "votar" para registrar seu voto.</p>
+              <p>Prezado(a) {dados.voterName}, selecione o(s) candidato(s) na lista abaixo e clique em "Votar" para registrar seu voto.</p>
 
               <div className="mt-4 p-5 bg-light rounded">
                 <div className="row">
@@ -190,7 +190,7 @@ export default function Vote(props) {
             </>
       }
 
-      {!data?.end && <div>O resultado será exibido assim que a votação for concluída...</div>}
+      {!data?.end && <div>O resultado será exibido assim que a votação for concluída. Por favor, aguarde.</div>}
 
       {data?.end && <div className="mt-4">
           <div className='d-flex align-items-center justify-content-between'>
